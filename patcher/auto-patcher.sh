@@ -52,6 +52,8 @@ while true; do
   NEW_TAG=$(cat "$LATEST_TAG_PATH" | head -n 1)
   CURRENT_TAG=$(grep "tag:" "$TMP_DIR/$HELM_VALUES_PATH" | awk '{print $2}')
 
+  git -C "$TMP_DIR" pull origin "$BRANCH"
+
   if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
     echo "🎉 New tag detected: $NEW_TAG (Previous: $CURRENT_TAG)"
     sed -i "s/tag:.*/tag: $NEW_TAG/" "$TMP_DIR/$HELM_VALUES_PATH"
