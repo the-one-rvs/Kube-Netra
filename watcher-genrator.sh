@@ -15,11 +15,11 @@ if [ "$ACCESS_TYPE" == "private" ]; then
   read -p "Enter Docker Hub PAT (token): " TOKEN
 fi
 
-PROJECT_NAME=$(echo "$DOCKER_IMAGE" | awk -F '/' '{print $2}')
+WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
 mkdir -p watchers
 
-WATCHER_FILE="watchers/${PROJECT_NAME}-watch.sh"
+WATCHER_FILE="watchers/${WATCHER_NAME}-watch.sh"
 
 cat << EOF > "$WATCHER_FILE"
 #!/bin/bash
