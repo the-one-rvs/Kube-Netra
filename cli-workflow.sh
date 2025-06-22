@@ -85,13 +85,25 @@ echo "Starting runners sequentially..."
 for pair in "${runner_mode_vec[@]}"; do
     runner_file=$(echo "$pair" | awk '{print $1}')
     mode=$(echo "$pair" | awk '{print $2}')
-    echo "Running: $runner_file (mode: $mode)"
-    bash "$runner_file"
-    if [[ $? -ne 0 ]]; then
-        echo "Runner failed: $runner_file"
-        exit 1
+    if [$mode == "manual"]; then
+        log_file="$SCRIPT_DIR/logs/${env}-${PATCHER_NAME}-manual-patcher.log"
+    elif [$mode == "auto"]; then
+        log_file="$SCRIPT_DIR/logs/${env}-${PATCHER_NAME}-auto-patcher.log"
+
+    if [$mode == "manual"]; then
+        while [[ ! -f "$log_file" ]]; do
+            echo "⏳ Waiting for log file: $log_file"
+            sleep 2
+        done
+    elif [$mode == "auto"]; then     
+        echo "Running: $runner_file (mode: $mode)"
+        bash "$runner_file"
+        if [[ $? -ne 0 ]]; then
+            echo "Runner failed: $runner_file"
+            exit 1
+        fi
+        echo "Completed: $runner_file"
     fi
-    echo "Completed: $runner_file"
 done
 
 echo "All runners completed."
