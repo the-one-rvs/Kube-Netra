@@ -16,9 +16,7 @@ if [ "$ACCESS_TYPE" == "private" ]; then
 fi
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-
 WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
-
 mkdir -p $SCRIPT_DIR/watchers
 
 WATCHER_FILE="$SCRIPT_DIR/watchers/${WATCHER_NAME}-watch.sh"
@@ -34,10 +32,7 @@ TOKEN="$TOKEN"
 
 API_URL="https://hub.docker.com/v2/repositories/\${DOCKER_IMAGE}/tags?page_size=100"
 
-# Assume this watcher lives in <root>/watchers
-# SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 KUBENETRA_DIR=$(dirname "$(readlink -f "$0")")
-
 mkdir -p "\$KUBENETRA_DIR/tags/list" "\$KUBENETRA_DIR/tags/latest"
 
 TAG_FILE="\$KUBENETRA_DIR/tags/list/${WATCHER_NAME}-tags.txt"
@@ -62,26 +57,28 @@ while true; do
     RESPONSE=\$(curl -s "\$API_URL")
   fi
 
-  TAGS=\$(echo "\$RESPONSE" | jq -r '.results[].name')
+  TAGS=\$(echo "\$RESPONSE" | jq -r '.results | sort_by(.last_updated) | reverse | .[].name')
 
   if [ -z "\$TAGS" ]; then
-    echo "⚠️  No tags found or failed to fetch tags!"
+    echo "⚠️ No tags found or failed to fetch tags!"
     echo "\$RESPONSE" | jq
   else
     if [ -s "\$TAG_FILE" ]; then
-      NEW_TAGS=\$(comm -13 "\$TAG_FILE" <(echo "\$TAGS"))
+      NEW_TAGS=\$(echo "\$TAGS" | grep -vxFf "\$TAG_FILE")
     else
       NEW_TAGS="\$TAGS"
     fi
 
     if [ -n "\$NEW_TAGS" ]; then
-      echo "🎉 NEW TAGS DETECTED:"
+      echo "🎉 New Tags Detected:"
       echo "\$NEW_TAGS"
+      # Save the latest tag
       echo "\$(echo "\$NEW_TAGS" | head -n 1)" > "\$LATEST_FILE"
     else
       echo "ℹ️ No new tags since last check."
     fi
 
+    # Save all sorted tags
     echo "\$TAGS" > "\$TAG_FILE"
   fi
 
