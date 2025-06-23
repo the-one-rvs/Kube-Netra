@@ -8,7 +8,6 @@ fi
 
 source "$1"
 
-# Check if environment is auto
 if [ "$MODE" != "auto" ]; then
   echo "⚠️ This environment is NOT configured for auto mode. Exiting."
   exit 1
@@ -23,19 +22,10 @@ if [ ! -f "$LATEST_TAG_PATH" ]; then
   exit 1
 fi
 
-# read -p "Your Github Persnol Access Token: " GIT_TOKEN
-
-# Use PAT if available
-# if [ -n "$GIT_TOKEN" ]; then
-#   GIT_REPO_URL=$(echo "$GIT_REPO" | sed -E "s|https://|https://${GIT_TOKEN}@|")
-# else
-#   GIT_REPO_URL="$GIT_REPO"
-# fi
-
 GIT_REPO_URL="$GIT_REPO"
-
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 TMP_DIR="$SCRIPT_DIR/${DOCKER_PROJECT_NAME}-auto-patch"
+
 mkdir -p "$TMP_DIR"
 
 # Clone or Pull
@@ -52,12 +42,12 @@ echo "👁️ Watching $HELM_VALUES_PATH for tag changes every 10 seconds..."
 echo "---------------------------------------------"
 
 while true; do
-  NEW_TAG=$(cat "$LATEST_TAG_PATH" | head -n 1)
+  NEW_TAG=$(head -n 1 "$LATEST_TAG_PATH")
   CURRENT_TAG=$(grep "tag:" "$TMP_DIR/$HELM_VALUES_PATH" | awk '{print $2}')
 
   git -C "$TMP_DIR" pull origin "$BRANCH"
 
-  sleep 5 
+  sleep 5
 
   if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
     echo "🎉 New tag detected: $NEW_TAG (Previous: $CURRENT_TAG)"
@@ -66,9 +56,8 @@ while true; do
     git -C "$TMP_DIR" add "$HELM_VALUES_PATH"
     git -C "$TMP_DIR" commit -m "🤖 Kube-Netra auto patch: updated tag to $NEW_TAG"
 
+    # Push will use the stored PAT from ~/.git-credentials
     git -C "$TMP_DIR" push origin "$BRANCH"
-
-    sleep 10
 
     echo "✅ Changes pushed to $BRANCH."
   else
