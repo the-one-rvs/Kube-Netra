@@ -68,6 +68,8 @@ while true; do
 
     git -C "$TMP_DIR" push origin "$BRANCH"
 
+    sleep 10
+
     echo "✅ Changes pushed to $BRANCH."
   else
     echo "ℹ️ No new tag. Current tag is still: $CURRENT_TAG."
