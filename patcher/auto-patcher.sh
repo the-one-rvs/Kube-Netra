@@ -23,14 +23,16 @@ if [ ! -f "$LATEST_TAG_PATH" ]; then
   exit 1
 fi
 
-read -p "Your Github Persnol Access Token: " GIT_TOKEN
+# read -p "Your Github Persnol Access Token: " GIT_TOKEN
 
 # Use PAT if available
-if [ -n "$GIT_TOKEN" ]; then
-  GIT_REPO_URL=$(echo "$GIT_REPO" | sed -E "s|https://|https://${GIT_TOKEN}@|")
-else
-  GIT_REPO_URL="$GIT_REPO"
-fi
+# if [ -n "$GIT_TOKEN" ]; then
+#   GIT_REPO_URL=$(echo "$GIT_REPO" | sed -E "s|https://|https://${GIT_TOKEN}@|")
+# else
+#   GIT_REPO_URL="$GIT_REPO"
+# fi
+
+GIT_REPO_URL="$GIT_REPO"
 
 TMP_DIR="/tmp/${DOCKER_PROJECT_NAME}-auto-patch"
 mkdir -p "$TMP_DIR"
@@ -53,6 +55,8 @@ while true; do
   CURRENT_TAG=$(grep "tag:" "$TMP_DIR/$HELM_VALUES_PATH" | awk '{print $2}')
 
   git -C "$TMP_DIR" pull origin "$BRANCH"
+
+  sleep 5 
 
   if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
     echo "🎉 New tag detected: $NEW_TAG (Previous: $CURRENT_TAG)"

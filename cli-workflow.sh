@@ -2,13 +2,16 @@
 
 read -p "What is the Project Name : " PROJ_NAME
 
-./watcher-genrator.sh
+
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+
+$SCRIPT_DIR/watcher-genrator.sh
+
 
 read -p "Enter the Docker Image name again : " DOCKER_IMAGE
 
 WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
 chmod +x $SCRIPT_DIR/patcher/auto-patcher.sh
 chmod +x $SCRIPT_DIR/patcher/manual-patcher.sh
@@ -17,16 +20,18 @@ chmod +x $SCRIPT_DIR/environment-genrator.sh
 chmod +x $SCRIPT_DIR/watcher-genrator.sh
 
 WATCHER_FILE="$SCRIPT_DIR/watchers/${WATCHER_NAME}-watch.sh"
+echo $WATCHER_FILE
 LOG_FILE_LOCATION="${WATCHER_NAME}-watch.sh"
 
 mkdir -p $SCRIPT_DIR/logs
 
 nohup $WATCHER_FILE > $SCRIPT_DIR/logs/$LOG_FILE_LOCATION.log 2>&1 &
+echo "Watcher Started ! Logs at ${SCRIPT_DIR}/logs/${LOG_FILE_LOCATION}.log"
 
 TAG_FILE="\$SCRIPT_DIR/tags/list/${PROJECT_NAME}-tags.txt"
 LATEST_FILE="\$SCRIPT_DIR/tags/latest/${PROJECT_NAME}-latest-tag.txt"
 
-./environment-genrator.sh
+$SCRIPT_DIR/environment-genrator.sh
 
 read -p "Enter the Patcher Name again : " PATCHER_NAME
 
