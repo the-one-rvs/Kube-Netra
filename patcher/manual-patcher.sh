@@ -33,8 +33,8 @@ fi
 # fi
 
 GIT_REPO_URL="$GIT_REPO"
-
-TMP_DIR="/tmp/${DOCKER_PROJECT_NAME}-auto-patch"
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+TMP_DIR="$SCRIPT_DIR/${DOCKER_PROJECT_NAME}-manual-patch"
 mkdir -p "$TMP_DIR"
 
 # Clone or Pull
