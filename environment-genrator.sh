@@ -42,12 +42,12 @@ EOF
     cat << EOF > "$RUNNER_FILE"
 #!/bin/bash
 # Runner for ${ENV_NAME}-${PATCHER_NAME}
-mkdir -p logs
+mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/auto-patcher.sh" "$ENV_FILE" \
-    > "logs/${ENV_NAME}-${PATCHER_NAME}-auto-patcher.log" 2>&1 &
+    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PATCHER_NAME}-auto-patcher.log" 2>&1 &
 EOF
     chmod +x "$RUNNER_FILE"
-    sleep 10
+    sleep 4
     # "$RUNNER_FILE"
 
   else
@@ -58,9 +58,9 @@ EOF
     cat << EOF > "$RUNNER_FILE"
 #!/bin/bash
 # Runner for ${ENV_NAME}-${PATCHER_NAME}
-mkdir -p logs
+mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/manual-patcher.sh" "$ENV_FILE" \
-    > "logs/${ENV_NAME}-${PATCHER_NAME}-manual-patcher.log" 2>&1 &
+    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PATCHER_NAME}-manual-patcher.log" 2>&1 &
 EOF
     chmod +x "$RUNNER_FILE"
   fi
@@ -69,9 +69,9 @@ EOF
   cat << EOF > "$DUAL_RUNNER_FILE"
 #!/bin/bash
 # Runner for ${ENV_NAME}-${PATCHER_NAME}
-mkdir -p logs
+mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/dual-patcher.sh" "$ENV_FILE" \
-    > "logs/${ENV_NAME}-${PATCHER_NAME}-dual-patcher.log" 2>&1 &
+    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PATCHER_NAME}-dual-patcher.log" 2>&1 &
 EOF
   chmod +x "$RUNNER_FILE"
 
