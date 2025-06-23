@@ -114,6 +114,7 @@ for pair in "${runner_mode_vec[@]}"; do
             exit 1
         fi
         echo "Completed: $runner_file"
+        sleep 30
     fi
 done
 
