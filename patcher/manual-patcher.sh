@@ -23,14 +23,16 @@ if [ ! -f "$LATEST_TAG_PATH" ]; then
   exit 1
 fi
 
-read -p "Your Github Persnol Access Token: " GIT_TOKEN
+# read -p "Your Github Persnol Access Token: " GIT_TOKEN
 
-# Use PAT if available
-if [ -n "$GIT_TOKEN" ]; then
-  GIT_REPO_URL=$(echo "$GIT_REPO" | sed -E "s|https://|https://${GIT_TOKEN}@|")
-else
-  GIT_REPO_URL="$GIT_REPO"
-fi
+# # Use PAT if available
+# if [ -n "$GIT_TOKEN" ]; then
+#   GIT_REPO_URL=$(echo "$GIT_REPO" | sed -E "s|https://|https://${GIT_TOKEN}@|")
+# else
+#   GIT_REPO_URL="$GIT_REPO"
+# fi
+
+GIT_REPO_URL="$GIT_REPO"
 
 TMP_DIR="/tmp/${DOCKER_PROJECT_NAME}-auto-patch"
 mkdir -p "$TMP_DIR"

@@ -15,11 +15,13 @@ if [ "$ACCESS_TYPE" == "private" ]; then
   read -p "Enter Docker Hub PAT (token): " TOKEN
 fi
 
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+
 WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
-mkdir -p watchers
+mkdir -p $SCRIPT_DIR/watchers
 
-WATCHER_FILE="watchers/${WATCHER_NAME}-watch.sh"
+WATCHER_FILE="$SCRIPT_DIR/watchers/${WATCHER_NAME}-watch.sh"
 
 cat << EOF > "$WATCHER_FILE"
 #!/bin/bash
@@ -33,8 +35,8 @@ TOKEN="$TOKEN"
 API_URL="https://hub.docker.com/v2/repositories/\${DOCKER_IMAGE}/tags?page_size=100"
 
 # Assume this watcher lives in <root>/watchers
-SCRIPT_DIR="\$(dirname "\$(readlink -f "\$0")")"
-KUBENETRA_DIR="\$(dirname "\$SCRIPT_DIR")/"
+# SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+KUBENETRA_DIR=$(dirname "$(readlink -f "$0")")
 
 mkdir -p "\$KUBENETRA_DIR/tags/list" "\$KUBENETRA_DIR/tags/latest"
 
@@ -60,7 +62,7 @@ while true; do
     RESPONSE=\$(curl -s "\$API_URL")
   fi
 
-  TAGS=\$(echo "\$RESPONSE" | jq -r '.results[].name' | sort)
+  TAGS=\$(echo "\$RESPONSE" | jq -r '.results[].name')
 
   if [ -z "\$TAGS" ]; then
     echo "⚠️  No tags found or failed to fetch tags!"
