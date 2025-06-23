@@ -13,6 +13,8 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 chmod +x $SCRIPT_DIR/patcher/auto-patcher.sh
 chmod +x $SCRIPT_DIR/patcher/manual-patcher.sh
 chmod +x $SCRIPT_DIR/patcher/dual-patcher.sh
+chmod +x $SCRIPT_DIR/environment-genrator.sh
+chmod +x $SCRIPT_DIR/watcher-genrator.sh
 
 WATCHER_FILE="$SCRIPT_DIR/watchers/${WATCHER_NAME}-watch.sh"
 LOG_FILE_LOCATION="${WATCHER_NAME}-watch.sh"
