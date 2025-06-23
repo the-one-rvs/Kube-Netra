@@ -10,11 +10,16 @@ WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
-WATCHER_FILE="watchers/${WATCHER_NAME}-watch.sh"
+chmod +x $SCRIPT_DIR/patcher/auto-patcher.sh
+chmod +x $SCRIPT_DIR/patcher/manual-patcher.sh
+chmod +x $SCRIPT_DIR/patcher/dual-patcher.sh
+
+WATCHER_FILE="$SCRIPT_DIR/watchers/${WATCHER_NAME}-watch.sh"
+LOG_FILE_LOCATION="${WATCHER_NAME}-watch.sh"
 
 mkdir -p $SCRIPT_DIR/logs
 
-nohup ./$WATCHER_FILE.sh > $SCRIPT_DIR/logs/$WATCHER_FILE.log 2>&1 &
+nohup $WATCHER_FILE > $SCRIPT_DIR/logs/$LOG_FILE_LOCATION.log 2>&1 &
 
 TAG_FILE="\$SCRIPT_DIR/tags/list/${PROJECT_NAME}-tags.txt"
 LATEST_FILE="\$SCRIPT_DIR/tags/latest/${PROJECT_NAME}-latest-tag.txt"
@@ -34,7 +39,7 @@ ENV_NAMES=$(find "$ENV_FOLDER" -type f -name "*.env.sh" -exec basename {} -$PATC
 
 echo "All Environment names:"
 declare -A env_map
-count = 0
+count=0
 for name in $ENV_NAMES; do
     ((count++))
     env_map[$count]="$name"
@@ -85,17 +90,16 @@ echo "Starting runners sequentially..."
 for pair in "${runner_mode_vec[@]}"; do
     runner_file=$(echo "$pair" | awk '{print $1}')
     mode=$(echo "$pair" | awk '{print $2}')
-    if [$mode == "manual"]; then
-        log_file="$SCRIPT_DIR/logs/${env}-${PATCHER_NAME}-manual-patcher.log"
-    elif [$mode == "auto"]; then
-        log_file="$SCRIPT_DIR/logs/${env}-${PATCHER_NAME}-auto-patcher.log"
+    env_name=$(basename "$runner_file" | sed -E "s/-${PATCHER_NAME}-runner\.sh//")
 
-    if [$mode == "manual"]; then
+    if [[ $mode == "manual" ]]; then
+        log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-manual-patcher.log"
         while [[ ! -f "$log_file" ]]; do
             echo "⏳ Waiting for log file: $log_file"
             sleep 2
         done
-    elif [$mode == "auto"]; then     
+    elif [[ $mode == "auto" ]]; then
+        log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-auto-patcher.log"
         echo "Running: $runner_file (mode: $mode)"
         bash "$runner_file"
         if [[ $? -ne 0 ]]; then

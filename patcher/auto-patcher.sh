@@ -15,7 +15,7 @@ if [ "$MODE" != "auto" ]; then
 fi
 
 # Derive project name
-DOCKER_PROJECT_NAME=$(echo "$DOCKER_IMAGE" | awk -F '/' '{print $2}')
+DOCKER_PROJECT_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
 # Paths
 if [ ! -f "$LATEST_TAG_PATH" ]; then

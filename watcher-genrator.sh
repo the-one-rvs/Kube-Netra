@@ -38,8 +38,8 @@ KUBENETRA_DIR="\$(dirname "\$SCRIPT_DIR")/"
 
 mkdir -p "\$KUBENETRA_DIR/tags/list" "\$KUBENETRA_DIR/tags/latest"
 
-TAG_FILE="\$KUBENETRA_DIR/tags/list/${PROJECT_NAME}-tags.txt"
-LATEST_FILE="\$KUBENETRA_DIR/tags/latest/${PROJECT_NAME}-latest-tag.txt"
+TAG_FILE="\$KUBENETRA_DIR/tags/list/${WATCHER_NAME}-tags.txt"
+LATEST_FILE="\$KUBENETRA_DIR/tags/latest/${WATCHER_NAME}-latest-tag.txt"
 
 touch "\$TAG_FILE" "\$LATEST_FILE"
 
