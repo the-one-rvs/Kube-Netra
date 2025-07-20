@@ -32,18 +32,26 @@ fi
 #   GIT_REPO_URL="$GIT_REPO"
 # fi
 
-GIT_REPO_URL="$GIT_REPO"
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-TMP_DIR="$SCRIPT_DIR/${DOCKER_PROJECT_NAME}-manual-patch"
-mkdir -p "$TMP_DIR"
+PATCHER_DIR=$(dirname "$(readlink -f "$0")")
+REPOS_DIR="$PATCHER_DIR/repos"
+mkdir -p "$REPOS_DIR"
+while true; do
+  RAND_SUFFIX=$((RANDOM % 10000))
+  TMP_DIR="$REPOS_DIR/${DOCKER_PROJECT_NAME}-manual-patch-$RAND_SUFFIX"
+  if [ ! -d "$TMP_DIR" ]; then
+    mkdir -p "$TMP_DIR"
+    break
+  fi
+done
 
-# Clone or Pull
+cd "$TMP_DIR" || exit 1
+
 if [ ! -d "$TMP_DIR/.git" ]; then
   echo "⏳ Cloning $GIT_REPO..."
-  git clone -b "$BRANCH" "$GIT_REPO_URL" "$TMP_DIR"
+  git clone -b "$BRANCH" "$GIT_REPO_URL" . 
 else
   echo "⏳ Pulling latest changes for $BRANCH..."
-  git -C "$TMP_DIR" pull origin "$BRANCH"
+  git  pull origin "$BRANCH"
 fi
 
 echo "🚀 Manual-Patcher started for $DOCKER_PROJECT_NAME..."
@@ -54,16 +62,16 @@ echo "---------------------------------------------"
 NEW_TAG=$(cat "$LATEST_TAG_PATH" | head -n 1)
 CURRENT_TAG=$(grep "tag:" "$TMP_DIR/$HELM_VALUES_PATH" | awk '{print $2}')
 
-git -C "$TMP_DIR" pull origin "$BRANCH"
+git  pull origin "$BRANCH"
 
 if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
   echo "🎉 New tag detected: $NEW_TAG (Previous: $CURRENT_TAG)"
   sed -i "s/tag:.*/tag: $NEW_TAG/" "$TMP_DIR/$HELM_VALUES_PATH"
 
-  git -C "$TMP_DIR" add "$HELM_VALUES_PATH"
-  git -C "$TMP_DIR" commit -m "🤖 Kube-Netra manual patch: updated tag to $NEW_TAG"
+  git  add "$HELM_VALUES_PATH"
+  git  commit -m "🤖 Kube-Netra manual patch: updated tag to $NEW_TAG"
 
-  git -C "$TMP_DIR" push origin "$BRANCH"
+  git  push origin "$BRANCH"
 
   echo "✅ Changes pushed to $BRANCH."
 else

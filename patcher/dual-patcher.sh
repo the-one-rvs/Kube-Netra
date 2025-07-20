@@ -17,15 +17,27 @@ if [ ! -f "$TAGS_PATH" ]; then
 fi
 
 # Get Current Tag
-TMP_DIR="/tmp/${DOCKER_PROJECT_NAME}-dual-patch"
-mkdir -p "$TMP_DIR"
+PATCHER_DIR=$(dirname "$(readlink -f "$0")")
+REPOS_DIR="$PATCHER_DIR/repos"
+mkdir -p "$REPOS_DIR"
+while true; do
+  RAND_SUFFIX=$((RANDOM % 10000))
+  TMP_DIR="$REPOS_DIR/${DOCKER_PROJECT_NAME}-auto-patch-$RAND_SUFFIX"
+  if [ ! -d "$TMP_DIR" ]; then
+    mkdir -p "$TMP_DIR"
+    break
+  fi
+done
 
+cd "$TMP_DIR" || exit 1
+
+# Clone or Pull
 if [ ! -d "$TMP_DIR/.git" ]; then
   echo "⏳ Cloning $GIT_REPO..."
-  git clone -b "$BRANCH" "$GIT_REPO" "$TMP_DIR"
+  git clone -b "$BRANCH" "$GIT_REPO_URL" . 
 else
   echo "⏳ Pulling latest changes for $BRANCH..."
-  git -C "$TMP_DIR" pull origin "$BRANCH"
+  git  pull origin "$BRANCH"
 fi
 
 CURRENT_TAG=$(grep "tag:" "$TMP_DIR/$HELM_VALUES_PATH" | awk '{print $2}')
