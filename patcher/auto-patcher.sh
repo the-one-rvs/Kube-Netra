@@ -23,18 +23,26 @@ if [ ! -f "$LATEST_TAG_PATH" ]; then
 fi
 
 GIT_REPO_URL="$GIT_REPO"
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-TMP_DIR="$SCRIPT_DIR/${DOCKER_PROJECT_NAME}-auto-patch"
 
-mkdir -p "$TMP_DIR"
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")") # Generate a unique TMP_DIR
+while true; do
+  RAND_SUFFIX=$((RANDOM % 10000))
+  TMP_DIR="$SCRIPT_DIR/${DOCKER_PROJECT_NAME}-auto-patch-$RAND_SUFFIX"
+  if [ ! -d "$TMP_DIR" ]; then
+    mkdir -p "$TMP_DIR"
+    break
+  fi
+done
+
+cd "$TMP_DIR" || exit 1
 
 # Clone or Pull
 if [ ! -d "$TMP_DIR/.git" ]; then
   echo "⏳ Cloning $GIT_REPO..."
-  git clone -b "$BRANCH" "$GIT_REPO_URL" "$TMP_DIR"
+  git clone -b "$BRANCH" "$GIT_REPO_URL" . 
 else
   echo "⏳ Pulling latest changes for $BRANCH..."
-  git -C "$TMP_DIR" pull origin "$BRANCH"
+  git  pull origin "$BRANCH"
 fi
 
 echo "🚀 Auto-Patcher started for $DOCKER_PROJECT_NAME..."
@@ -45,7 +53,7 @@ while true; do
   NEW_TAG=$(head -n 1 "$LATEST_TAG_PATH")
   CURRENT_TAG=$(grep "tag:" "$TMP_DIR/$HELM_VALUES_PATH" | awk '{print $2}')
 
-  git -C "$TMP_DIR" pull origin "$BRANCH"
+  git  pull origin "$BRANCH"
 
   sleep 5
 
@@ -53,11 +61,11 @@ while true; do
     echo "🎉 New tag detected: $NEW_TAG (Previous: $CURRENT_TAG)"
     sed -i "s/tag:.*/tag: $NEW_TAG/" "$TMP_DIR/$HELM_VALUES_PATH"
 
-    git -C "$TMP_DIR" add "$HELM_VALUES_PATH"
-    git -C "$TMP_DIR" commit -m "🤖 Kube-Netra auto patch: updated tag to $NEW_TAG"
+    git  add "$HELM_VALUES_PATH"
+    git  commit -m "🤖 Kube-Netra auto patch: updated tag to $NEW_TAG"
 
     # Push will use the stored PAT from ~/.git-credentials
-    git -C "$TMP_DIR" push origin "$BRANCH"
+    git  push origin "$BRANCH"
 
     echo "✅ Changes pushed to $BRANCH."
   else
