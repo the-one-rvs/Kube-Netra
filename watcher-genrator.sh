@@ -33,7 +33,7 @@ TOKEN="$TOKEN"
 API_URL="https://hub.docker.com/v2/repositories/\${DOCKER_IMAGE}/tags?page_size=100"
 
 KUBENETRA_DIR=$(dirname "$(readlink -f "$0")")
-mkdir -p "\$KUBENETRA_DIR/tags/list" "\$KUBENETRA_DIR/tags/latest"
+mkdir -p "\$KUBENETRA_DIR/tags/list" "\$KUBENETRA_DIR/tags/latest" "\$KUBENETRA_DIR/detector"
 
 TAG_FILE="\$KUBENETRA_DIR/tags/list/${WATCHER_NAME}-tags.txt"
 LATEST_FILE="\$KUBENETRA_DIR/tags/latest/${WATCHER_NAME}-latest-tag.txt"
@@ -48,7 +48,12 @@ echo "Saving tags to: \$TAG_FILE"
 echo "Saving latest tag to: \$LATEST_FILE"
 echo "------------------------------------------"
 
+count=0
+DETECTOR_SIGNAL="\$KUBENETRA_DIR/detector/${WATCHER_NAME}-new-tag"
+
+
 while true; do
+  ((count++))
   echo "⏳ Fetching tags at \$(date)..."
 
   if [ "\$ACCESS_TYPE" == "private" ]; then
@@ -71,6 +76,9 @@ while true; do
 
     if [ -n "\$NEW_TAGS" ]; then
       echo "🎉 New Tags Detected:"
+      if [[ "\$count" -gt 2 ]]; then
+        touch "\$DETECTOR_SIGNAL"
+      fi
       echo "\$NEW_TAGS"
       # Save the latest tag
       echo "\$(echo "\$NEW_TAGS" | head -n 1)" > "\$LATEST_FILE"

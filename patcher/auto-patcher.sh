@@ -62,7 +62,7 @@ while true; do
   if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
     echo "🎉 New tag detected: $NEW_TAG (Previous: $CURRENT_TAG)"
     sed -i "s/tag:.*/tag: $NEW_TAG/" "$TMP_DIR/$HELM_VALUES_PATH"
-
+    git  pull origin "$BRANCH"
     git  add "$HELM_VALUES_PATH"
     git  commit -m "🤖 Kube-Netra auto patch: updated tag to $NEW_TAG"
 

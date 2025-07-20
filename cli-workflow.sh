@@ -5,6 +5,8 @@ read -p "What is the Project Name : " PROJ_NAME
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
+cd $SCRIPT_DIR
+
 $SCRIPT_DIR/watcher-genrator.sh
 
 
@@ -90,32 +92,47 @@ for env in "${selected_envs[@]}"; do
     fi
 done
 
-# ...existing code...
-
 echo "Starting runners sequentially..."
+(
+DETECTOR_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-new-tag"
+echo "📡 Finding new tags. "
 
-for pair in "${runner_mode_vec[@]}"; do
-    runner_file=$(echo "$pair" | awk '{print $1}')
-    mode=$(echo "$pair" | awk '{print $2}')
-    env_name=$(basename "$runner_file" | sed -E "s/-${PATCHER_NAME}-runner\.sh//")
+while true; do
+    if [[ -f "$DETECTOR_SIGNAL" ]]; then
+        echo "🚨 Signal detected. Proceeding with patchers..."
 
-    if [[ $mode == "manual" ]]; then
-        log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-manual-patcher.log"
-        while [[ ! -f "$log_file" ]]; do
-            echo "⏳ Waiting for log file: $log_file"
-            sleep 2
+        for pair in "${runner_mode_vec[@]}"; do
+            runner_file=$(echo "$pair" | awk '{print $1}')
+            mode=$(echo "$pair" | awk '{print $2}')
+            env_name=$(basename "$runner_file" | sed -E "s/-${PATCHER_NAME}-runner\.sh//")
+
+            if [[ $mode == "manual" ]]; then
+                log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-manual-patcher.log"
+                while [[ ! -f "$log_file" ]]; do
+                    echo "🕐 Waiting for manual patcher to start: $log_file"
+                    sleep 2
+                done
+            elif [[ $mode == "auto" ]]; then
+                log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-auto-patcher.log"
+                echo "▶️ Starting: $runner_file"
+                bash "$runner_file"
+                [[ $? -ne 0 ]] && echo "❌ Failed: $runner_file" && exit 1
+                echo "✅ Done: $runner_file"
+                sleep 5
+            fi
         done
-    elif [[ $mode == "auto" ]]; then
-        log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-auto-patcher.log"
-        echo "Running: $runner_file (mode: $mode)"
-        bash "$runner_file"
-        if [[ $? -ne 0 ]]; then
-            echo "Runner failed: $runner_file"
-            exit 1
-        fi
-        echo "Completed: $runner_file"
+
         sleep 30
+        rm -f "$DETECTOR_SIGNAL"
+
+        echo "📤 Signal processed and removed. Exiting."
+
+        pkill -f $WATCHER_FILE
+        pkill -f $SCRIPT_DIR/patcher/auto-patcher.sh
+        pkill -f $SCRIPT_DIR/patcher/manual-patcher.sh
+    else
+        echo "🕵️ Still waiting... ($DETECTOR_SIGNAL not found)"
+        sleep 5
     fi
 done
-
-echo "All runners completed."
+) > "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log" 2>&1 & disown
