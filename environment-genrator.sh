@@ -9,15 +9,19 @@ mkdir -p $SCRIPT_DIR/env/$PATCHER_NAME
 read -p "How many Environments do you want? " NUMBER
 count=1
 while [ $count -le $NUMBER ]; do
-  read -p "Enter name for environment $count: " ENV_NAME
+  echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
+  echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
+  echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
+ 
+  read -p "👉 Enter name for environment $count: " ENV_NAME
   ENV_FILE="$SCRIPT_DIR/env/$PATCHER_NAME/${ENV_NAME}-${PATCHER_NAME}.env.sh"
 
   # Get Inputs
-  read -p "Enter the DOCKER IMAGE : " DOCKER_IMAGE
-  read -p "Enter the GIT REPO : " GIT_REPO
-  read -p "Enter the HELM VALUES PATH : " HELM_VALUES_PATH
-  read -p "Enter the MODE : (auto/manual) " MODE
-  read -p "Enter the BRANCH : " BRANCH
+  read -p "👉 Enter the DOCKER IMAGE : " DOCKER_IMAGE
+  read -p "👉 Enter the GIT REPO : " GIT_REPO
+  read -p "👉 Enter the HELM VALUES PATH : " HELM_VALUES_PATH
+  read -p "👉 Enter the MODE : (auto/manual) " MODE
+  read -p "👉 Enter the BRANCH : " BRANCH
   WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
   # Create the environment file
   cat << EOF > "$ENV_FILE"
