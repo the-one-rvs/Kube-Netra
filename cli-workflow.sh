@@ -2,6 +2,9 @@
 
 read -p "What is the Project Name : " PROJ_NAME
 
+echo "=================================================================================================================="
+echo "=================================================================================================================="
+echo "=================================================================================================================="
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
@@ -9,8 +12,12 @@ cd $SCRIPT_DIR
 
 $SCRIPT_DIR/watcher-genrator.sh
 
+echo "=================================================================================================================="
+echo "=================================================================================================================="
+echo "=================================================================================================================="
 
-read -p "Enter the Docker Image name again : " DOCKER_IMAGE
+
+read -p "👉 Enter the Docker Image name again for running watcher : " DOCKER_IMAGE
 
 WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
@@ -33,9 +40,18 @@ echo "Watcher Started ! Logs at ${SCRIPT_DIR}/logs/${LOG_FILE_LOCATION}.log"
 TAG_FILE="\$SCRIPT_DIR/tags/list/${PROJECT_NAME}-tags.txt"
 LATEST_FILE="\$SCRIPT_DIR/tags/latest/${PROJECT_NAME}-latest-tag.txt"
 
+echo "=================================================================================================================="
+echo "=================================================================================================================="
+echo "=================================================================================================================="
+
 $SCRIPT_DIR/environment-genrator.sh
 
-read -p "Enter the Patcher Name again : " PATCHER_NAME
+read -p "👉 Enter the Patcher Name again for running runners : " PATCHER_NAME
+
+echo "=================================================================================================================="
+echo "=================================================================================================================="
+echo "=================================================================================================================="
+
 
 ENV_FOLDER="$SCRIPT_DIR/env/$PATCHER_NAME/"
 
@@ -56,9 +72,9 @@ for name in $ENV_NAMES; do
 done
 
 selected_envs=()
-echo " Create the flow through the number of environment "
+echo "👉 Create the flow through the number of environment "
 for ((num=0; num<$ENV_COUNT; num++)); do
-    read -p "Enter your Environment Number : " ENV_SUB_NUM
+    read -p "👉 Enter your Environment Number : " ENV_SUB_NUM
     selected_envs+=("${env_map[$ENV_SUB_NUM]}")
 done
 
