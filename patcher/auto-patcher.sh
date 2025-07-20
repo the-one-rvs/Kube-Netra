@@ -24,10 +24,12 @@ fi
 
 GIT_REPO_URL="$GIT_REPO"
 
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")") # Generate a unique TMP_DIR
+PATCHER_DIR=$(dirname "$(readlink -f "$0")")
+REPOS_DIR="$PATCHER_DIR/repos"
+mkdir -p "$REPOS_DIR"
 while true; do
   RAND_SUFFIX=$((RANDOM % 10000))
-  TMP_DIR="$SCRIPT_DIR/${DOCKER_PROJECT_NAME}-auto-patch-$RAND_SUFFIX"
+  TMP_DIR="$REPOS_DIR/${DOCKER_PROJECT_NAME}-auto-patch-$RAND_SUFFIX"
   if [ ! -d "$TMP_DIR" ]; then
     mkdir -p "$TMP_DIR"
     break
@@ -64,7 +66,6 @@ while true; do
     git  add "$HELM_VALUES_PATH"
     git  commit -m "🤖 Kube-Netra auto patch: updated tag to $NEW_TAG"
 
-    # Push will use the stored PAT from ~/.git-credentials
     git  push origin "$BRANCH"
 
     echo "✅ Changes pushed to $BRANCH."
