@@ -44,6 +44,11 @@ while true; do
   fi
 done
 
+REPO_NAME=$(basename "${GIT_REPO}")
+# echo "$REPO_NAME"
+
+GIT_REPO_URL=https://${GITHUB_USERNAME}:${GITHUB_PAT}@github.com/${GITHUB_USERNAME}/${REPO_NAME}.git
+
 cd "$TMP_DIR" || exit 1
 
 if [ ! -d "$TMP_DIR/.git" ]; then

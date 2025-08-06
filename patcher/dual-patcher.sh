@@ -31,6 +31,14 @@ done
 
 cd "$TMP_DIR" || exit 1
 
+REPO_NAME=$(basename "${GIT_REPO}")
+# echo "$REPO_NAME"
+
+GIT_REPO_URL=https://${GITHUB_USERNAME}:${GITHUB_PAT}@github.com/${GITHUB_USERNAME}/${REPO_NAME}.git
+
+git config --global user.name "the-one-rvs"
+git config --global user.email "vaibhavsarswat142005@gmail.com"
+
 # Clone or Pull
 if [ ! -d "$TMP_DIR/.git" ]; then
   echo "⏳ Cloning $GIT_REPO..."
