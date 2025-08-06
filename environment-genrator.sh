@@ -6,6 +6,10 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
 mkdir -p $SCRIPT_DIR/env/$PATCHER_NAME
 
+echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
+read -p "👉 Enter the GITHUB PAT with edit access to repo : " GITHUB_PAT
+read -p "👉  Enter GITHUB Username : " GITHUB_USERNAME
+
 read -p "How many Environments do you want? " NUMBER
 count=1
 while [ $count -le $NUMBER ]; do
@@ -34,6 +38,8 @@ MODE="$MODE"
 BRANCH="$BRANCH"
 TAGS_PATH="$SCRIPT_DIR/tags/list/$WATCHER_NAME-tags.txt"
 LATEST_TAG_PATH="$SCRIPT_DIR/tags/latest/$WATCHER_NAME-latest-tag.txt"
+GITHUB_PAT="$GITHUB_PAT"
+GITHUB_USERNAME="$GITHUB_USERNAME"
 EOF
 
   chmod +x "$ENV_FILE"

@@ -22,7 +22,14 @@ if [ ! -f "$LATEST_TAG_PATH" ]; then
   exit 1
 fi
 
-GIT_REPO_URL="$GIT_REPO"
+REPO_NAME=$(basename "${GIT_REPO}")
+# echo "$REPO_NAME"
+
+GIT_REPO_URL=https://${GITHUB_USERNAME}:${GITHUB_PAT}@github.com/${GITHUB_USERNAME}/${REPO_NAME}.git
+
+git config --global user.name "the-one-rvs"
+git config --global user.email "vaibhavsarswat142005@gmail.com"
+
 
 PATCHER_DIR=$(dirname "$(readlink -f "$0")")
 REPOS_DIR="$PATCHER_DIR/repos"

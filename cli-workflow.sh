@@ -143,7 +143,7 @@ while true; do
 
         echo "📤 Signal processed and removed. Exiting."
 
-        pkill -f $WATCHER_FILE
+        # pkill -f $WATCHER_FILE
         pkill -f $SCRIPT_DIR/patcher/auto-patcher.sh
         pkill -f $SCRIPT_DIR/patcher/manual-patcher.sh
     else
