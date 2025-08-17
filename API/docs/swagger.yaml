@@ -1,0 +1,429 @@
+openapi: 3.0.3
+info:
+  title: Project Management API
+  description: API documentation for user, project, environment and PAT management.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api/v1
+
+components:
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken
+
+  responses:
+    UnauthorizedError:
+      description: Authentication required or invalid token
+    ForbiddenError:
+      description: Permission denied
+    NotFoundError:
+      description: Resource not found
+    ServerError:
+      description: Internal server error
+
+  schemas:
+    Project:
+      type: object
+      properties:
+        projectId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    Environment:
+      type: object
+      properties:
+        environmentNumber:
+          type: integer
+        name:
+          type: string
+        dockerImage:
+          type: string
+    User:
+      type: object
+      properties:
+        userId:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+
+security:
+  - CookieAuth: []
+
+paths:
+  ############################
+  # User Routes
+  ############################
+  /users/createRootAdmin:
+    post:
+      summary: Create the root admin
+      tags: [User]
+      responses:
+        "201": { description: Root admin created }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /users/register:
+    post:
+      summary: Register a new user
+      tags: [User]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+                name: { type: string }
+      responses:
+        "201": { description: User registered }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+
+  /users/login:
+    post:
+      summary: Login user
+      tags: [User]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200": { description: Logged in successfully }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+
+  /users/logout:
+    get:
+      summary: Logout user
+      tags: [User]
+      responses:
+        "200": { description: Logged out }
+        "401": { $ref: "#/components/responses/UnauthorizedError" }
+
+  /users/currentUser:
+    get:
+      summary: Get current user
+      tags: [User]
+      responses:
+        "200":
+          description: Current user details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/allUsers:
+    get:
+      summary: Get all users
+      tags: [User]
+      responses:
+        "200": { description: List of users }
+
+  /users/reclaimTokens:
+    get:
+      summary: Refresh and reclaim tokens
+      tags: [User]
+      responses:
+        "200": { description: Tokens refreshed }
+
+  /users/updateUserDetails:
+    patch:
+      summary: Update user details
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                email: { type: string }
+      responses:
+        "200": { description: User updated }
+
+  /users/changePassword:
+    patch:
+      summary: Change user password
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword: { type: string }
+                newPassword: { type: string }
+      responses:
+        "200": { description: Password changed }
+
+  /users/deleteUser:
+    delete:
+      summary: Delete a user
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId: { type: string }
+      responses:
+        "200": { description: User deleted }
+
+  /users/getPermission:
+    get:
+      summary: Show available permissions
+      tags: [Permissions]
+      responses:
+        "200": { description: List of permissions }
+
+  /users/addPermission:
+    post:
+      summary: Add a permission to a user
+      tags: [Permissions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId: { type: string }
+                permission: { type: string }
+      responses:
+        "200": { description: Permission added }
+
+  /users/removePermission:
+    post:
+      summary: Remove a permission from a user
+      tags: [Permissions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId: { type: string }
+                permission: { type: string }
+      responses:
+        "200": { description: Permission removed }
+
+  ############################
+  # Project Routes
+  ############################
+  /project/createProject:
+    post:
+      summary: Create a new project
+      tags: [Project]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Project"
+      responses:
+        "201": { description: Project created }
+
+  /project/enterProject/{projectId}:
+    get:
+      summary: Enter a project
+      tags: [Project]
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Project entered }
+
+  /project/exitProject:
+    get:
+      summary: Exit current project
+      tags: [Project]
+      responses:
+        "200": { description: Project exited }
+
+  /project/updateProject:
+    patch:
+      summary: Update a project
+      tags: [Project]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Project"
+      responses:
+        "200": { description: Project updated }
+
+  /project/deleteProject:
+    delete:
+      summary: Delete a project
+      tags: [Project]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectId: { type: string }
+      responses:
+        "200": { description: Project deleted }
+
+  /project/getCurrentProjectDetails:
+    get:
+      summary: Get details of current project
+      tags: [Project]
+      responses:
+        "200": { description: Current project details }
+
+  /project/getAllProjects:
+    get:
+      summary: Get all projects
+      tags: [Project]
+      responses:
+        "200": { description: List of projects }
+
+  ############################
+  # Environment Routes
+  ############################
+  /environment/createEnvironment:
+    post:
+      summary: Create environment in a project
+      tags: [Environment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Environment"
+      responses:
+        "201": { description: Environment created }
+
+  /environment/getEnvironment/{projectId}/{environmentNumber}:
+    get:
+      summary: Get environment by projectId + number
+      tags: [Environment]
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: environmentNumber
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Environment details }
+
+  /environment/updateEnvironment:
+    patch:
+      summary: Update an environment
+      tags: [Environment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Environment"
+      responses:
+        "200": { description: Environment updated }
+
+  /environment/getAllEnvironment:
+    get:
+      summary: Get all environments in current project
+      tags: [Environment]
+      responses:
+        "200": { description: List of environments }
+
+  /environment/deleteEnvironment:
+    delete:
+      summary: Delete environment
+      tags: [Environment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectId: { type: string }
+                environmentNumber: { type: integer }
+      responses:
+        "200": { description: Environment deleted }
+
+  ############################
+  # PAT Routes
+  ############################
+  /pat/addGithubPAT:
+    post:
+      summary: Add a GitHub PAT
+      tags: [PAT]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nameOfPAT: { type: string }
+                githubUsername: { type: string }
+                githubPAT: { type: string }
+      responses:
+        "201": { description: PAT added }
+
+  /pat/showPATProjects:
+    get:
+      summary: Show projects linked to PAT
+      tags: [PAT]
+      responses:
+        "200": { description: List of PAT projects }
+
+  /pat/addPATinProject:
+    post:
+      summary: Add PAT to a project
+      tags: [PAT]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patId: { type: string }
+                projectId: { type: string }
+      responses:
+        "200": { description: PAT linked to project }
+
+  /pat/deletePAT:
+    delete:
+      summary: Delete a GitHub PAT
+      tags: [PAT]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patId: { type: string }
+      responses:
+        "200": { description: PAT deleted }

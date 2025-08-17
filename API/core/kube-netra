@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Kube-Netra CLI tool
+VERSION="0.1.0"
+
+# Help message
+show_help() {
+    echo "kube-Netra - Promotion Automation CLI"
+    echo
+    echo "Usage: kube-netra --create-promotion"
+    echo
+    echo "Options:"
+    echo "  --create-promotion      Start promotion workflow"
+    echo "  --version               Show version information"
+    echo "  --help                  Show this help message"
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --create-promotion)
+            CREATE_PROMOTION=true
+            shift
+            ;;
+        --version)
+            echo "kube-Netra CLI version $VERSION"
+            exit 0
+            ;;
+        --help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
+# Execute create-promotion command
+if [[ "$CREATE_PROMOTION" == "true" ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+    chmod +x "$SCRIPT_DIR/cli-workflow.sh"
+    "$SCRIPT_DIR/cli-workflow.sh"
+    exit 0
+fi
+
+show_help
+exit 1
