@@ -36,6 +36,14 @@ const createEnvironment = asyncHandler(async(req, res) => {
             mode,
             branch
         })
+
+        const proj = await Project.findById(req.project._id)
+        proj.environments.push(environment._id)
+        await proj.save()
+
+        if (!environment) {
+            throw new ApiError(400, "Environment not created")
+        }
         return res
         .status(200)
         .json ( new ApiResponse(200, environment, "Environment Created"))
@@ -106,20 +114,7 @@ const getEnvironment = asyncHandler(async(req, res) => {
         const environment = await Environment.findOne({
             projectId: projectId, 
             environmentNumber: environmentNumber
-        }).lean()
-        
-        const project = await Project.findById(projectId).select("dockerImage nameOfGithubPAT").lean();
-
-        const githubPAT = await GithubPAT.findOne({nameOfPAT: project.nameOfGithubPAT}).select("githubPAT githubUsername").lean();
-
-        const enrichedEnvironment = {
-            ...environment,
-            dockerImage: project.dockerImage,
-            nameOfGithubPAT: project.nameOfGithubPAT,
-            githubPAT: githubPAT?.githubPAT || null,
-            githubUsername: githubPAT?.githubUsername || null
-        };
-
+        })
 
         if (!environment) {
             throw new ApiError(404, "Environment not found")
@@ -127,7 +122,7 @@ const getEnvironment = asyncHandler(async(req, res) => {
 
         return res
         .status(200)
-        .json ( new ApiResponse(200, enrichedEnvironment, "Environment found"))
+        .json ( new ApiResponse(200, environment, "Environment found"))
     }
     catch(error){
         throw new ApiError(400, (error?.message))
