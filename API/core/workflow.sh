@@ -59,27 +59,16 @@ done
 
 selected_envs=()
 echo "👉 Create the flow through the number of environment "
-for ((num=0; num<$ENV_COUNT; num++)); do
-    read -p "👉 Enter your Environment Number : " ENV_SUB_NUM
-    selected_envs+=("${env_map[$ENV_SUB_NUM]}")
-done
-
-echo "Selected environments:"
-for env in "${selected_envs[@]}"; do
-    echo "$env"
-done
-
-# runner_files=()
-
-# for env in "${selected_envs[@]}"; do
-#     # Search for runner scripts for this environment in all runner types (auto/manual/dual)
-#     found_runners=$(find "$SCRIPT_DIR/runners/$PROJ_NAME" -type f -name "${env}-${PROJ_NAME}-runner.sh")
-#     for runner in $found_runners; do
-#         runner_files+=("$runner")
-#     done
-# done
 
 runner_mode_vec=()
+#create selected envs array from ENV_DETAILS
+
+count=1
+while [ $count -le $NUM_ENV ]; do
+    ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].environmentName")
+    selected_envs+=("$ENV_NAME")
+    count=$((count + 1))
+done
 
 for env in "${selected_envs[@]}"; do
     runner_file_auto="$SCRIPT_DIR/runners/$PROJ_NAME/auto/${env}-${PROJ_NAME}-runner.sh"
