@@ -1,23 +1,15 @@
 #!/bin/bash
 
-read -p "What is the Project Name : " PROJ_NAME
-
-echo "=================================================================================================================="
-echo "=================================================================================================================="
-echo "=================================================================================================================="
+echo "📦 PROJECT_NAME : $PROJ_NAME"
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
 cd $SCRIPT_DIR
 
-$SCRIPT_DIR/watcher-genrator.sh
-
-echo "=================================================================================================================="
-echo "=================================================================================================================="
-echo "=================================================================================================================="
+$SCRIPT_DIR/watcher-genrator.sh "$DOCKER_IMAGE" "$POLL_INTERVAL" "$ACCESS_TYPE" "$USERNAME" "$TOKEN"
 
 
-read -p "👉 Enter the Docker Image name again for running watcher : " DOCKER_IMAGE
+echo "🐳 Docker Image: $DOCKER_IMAGE"
 
 WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
@@ -37,8 +29,8 @@ mkdir -p $SCRIPT_DIR/logs
 nohup $WATCHER_FILE > $SCRIPT_DIR/logs/$LOG_FILE_LOCATION.log 2>&1 &
 echo "Watcher Started ! Logs at ${SCRIPT_DIR}/logs/${LOG_FILE_LOCATION}.log"
 
-TAG_FILE="\$SCRIPT_DIR/tags/list/${PROJECT_NAME}-tags.txt"
-LATEST_FILE="\$SCRIPT_DIR/tags/latest/${PROJECT_NAME}-latest-tag.txt"
+TAG_FILE="\$SCRIPT_DIR/tags/list/${PROJ_NAME}-tags.txt"
+LATEST_FILE="\$SCRIPT_DIR/tags/latest/${PROJ_NAME}-latest-tag.txt"
 
 echo "=================================================================================================================="
 echo "=================================================================================================================="
@@ -46,21 +38,15 @@ echo "==========================================================================
 
 $SCRIPT_DIR/environment-genrator.sh
 
-read -p "👉 Enter the Patcher Name again for running runners : " PATCHER_NAME
 
-echo "=================================================================================================================="
-echo "=================================================================================================================="
-echo "=================================================================================================================="
-
-
-ENV_FOLDER="$SCRIPT_DIR/env/$PATCHER_NAME/"
+ENV_FOLDER="$SCRIPT_DIR/env/$PROJ_NAME/"
 
 ENV_COUNT=$(find "$ENV_FOLDER" -type f -name "*.env.sh" | wc -l)
 echo "Total number of env files: $ENV_COUNT"
 
 # ENV_FOLDER=env/Task
 
-ENV_NAMES=$(find "$ENV_FOLDER" -type f -name "*.env.sh" -exec basename {} -$PATCHER_NAME.env.sh \;)
+ENV_NAMES=$(find "$ENV_FOLDER" -type f -name "*.env.sh" -exec basename {} -$PROJ_NAME.env.sh \;)
 
 echo "All Environment names:"
 declare -A env_map
@@ -87,7 +73,7 @@ done
 
 # for env in "${selected_envs[@]}"; do
 #     # Search for runner scripts for this environment in all runner types (auto/manual/dual)
-#     found_runners=$(find "$SCRIPT_DIR/runners/$PATCHER_NAME" -type f -name "${env}-${PATCHER_NAME}-runner.sh")
+#     found_runners=$(find "$SCRIPT_DIR/runners/$PROJ_NAME" -type f -name "${env}-${PROJ_NAME}-runner.sh")
 #     for runner in $found_runners; do
 #         runner_files+=("$runner")
 #     done
@@ -96,8 +82,8 @@ done
 runner_mode_vec=()
 
 for env in "${selected_envs[@]}"; do
-    runner_file_auto="$SCRIPT_DIR/runners/$PATCHER_NAME/auto/${env}-${PATCHER_NAME}-runner.sh"
-    runner_file_manual="$SCRIPT_DIR/runners/$PATCHER_NAME/manual/${env}-${PATCHER_NAME}-runner.sh"
+    runner_file_auto="$SCRIPT_DIR/runners/$PROJ_NAME/auto/${env}-${PROJ_NAME}-runner.sh"
+    runner_file_manual="$SCRIPT_DIR/runners/$PROJ_NAME/manual/${env}-${PROJ_NAME}-runner.sh"
 
     if [[ -f "$runner_file_auto" ]]; then
         runner_mode_vec+=("$runner_file_auto auto")
@@ -120,16 +106,16 @@ while true; do
         for pair in "${runner_mode_vec[@]}"; do
             runner_file=$(echo "$pair" | awk '{print $1}')
             mode=$(echo "$pair" | awk '{print $2}')
-            env_name=$(basename "$runner_file" | sed -E "s/-${PATCHER_NAME}-runner\.sh//")
+            env_name=$(basename "$runner_file" | sed -E "s/-${PROJ_NAME}-runner\.sh//")
 
             if [[ $mode == "manual" ]]; then
-                log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-manual-patcher.log"
+                log_file="$SCRIPT_DIR/logs/${env_name}-${PROJ_NAME}-manual-patcher.log"
                 while [[ ! -f "$log_file" ]]; do
                     echo "🕐 Waiting for manual patcher to start: $log_file"
                     sleep 2
                 done
             elif [[ $mode == "auto" ]]; then
-                log_file="$SCRIPT_DIR/logs/${env_name}-${PATCHER_NAME}-auto-patcher.log"
+                log_file="$SCRIPT_DIR/logs/${env_name}-${PROJ_NAME}-auto-patcher.log"
                 echo "▶️ Starting: $runner_file"
                 bash "$runner_file"
                 [[ $? -ne 0 ]] && echo "❌ Failed: $runner_file" && exit 1

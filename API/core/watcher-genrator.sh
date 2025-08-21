@@ -3,16 +3,16 @@
 echo "🚀 Kube-Netra Watcher Generator"
 
 # Prompt for image details
-read -p "Enter Docker image (namespace/repo): " DOCKER_IMAGE
-read -p "Enter poll interval (in seconds): " POLL_INTERVAL
-read -p "Is the image public or private? (public/private): " ACCESS_TYPE
+DOCKER_IMAGE=$1
+POLL_INTERVAL=$2
+ACCESS_TYPE=$3
 
 USERNAME=""
 TOKEN=""
 
 if [ "$ACCESS_TYPE" == "private" ]; then
-  read -p "Enter Docker Hub username: " USERNAME
-  read -p "Enter Docker Hub PAT (token): " TOKEN
+  USERNAME=$4
+  TOKEN=$5
 fi
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
