@@ -66,5 +66,9 @@ export const PERMISSION_LIST = [
   {
     name: "access_delete_pat",
     description: "Access to delete Github PAT"
+  },
+  {
+    name: "access_start_workflow",
+    description: "Access to start the workflow"
   }
 ]

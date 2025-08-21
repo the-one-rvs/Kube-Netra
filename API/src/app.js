@@ -42,4 +42,7 @@ app.use("/api/v1/environment", environmentRouter)
 import patRouter from './routes/pat.routes.js'
 app.use("/api/v1/pat", patRouter)
 
+import callCoreRouter from './routes/callCore.routes.js'
+app.use("/api/v1/callCore", callCoreRouter)
+
 export { app }
