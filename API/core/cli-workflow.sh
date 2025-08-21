@@ -36,10 +36,10 @@ echo "==========================================================================
 echo "=================================================================================================================="
 echo "=================================================================================================================="
 
-$SCRIPT_DIR/environment-genrator.sh
+#size of env details
+NUM_ENV=$(echo "$ENV_DETAILS" | jq '. | length')
 
-
-ENV_FOLDER="$SCRIPT_DIR/env/$PROJ_NAME/"
+$SCRIPT_DIR/environment-genrator.sh "$ENV_DETAILS" "$NUM_ENV" "$PROJ_NAME" "$DOCKER_IMAGE"
 
 ENV_COUNT=$(find "$ENV_FOLDER" -type f -name "*.env.sh" | wc -l)
 echo "Total number of env files: $ENV_COUNT"

@@ -1,31 +1,42 @@
 #!/bin/bash
 
-read -p "Enter the Patcher-Name: " PATCHER_NAME 
+ENV_DETAILS=$1
+NUM_ENV=$2
+PROJ_NAME=$3
+DOCKER_IMAGE=$4
 # echo $(find / -type d -name "Kube-Netra" 2>/dev/null)
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
-mkdir -p $SCRIPT_DIR/env/$PATCHER_NAME
+mkdir -p $SCRIPT_DIR/env/$PROJ_NAME
 
-echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
-read -p "👉 Enter the GITHUB PAT with edit access to repo : " GITHUB_PAT
-read -p "👉  Enter GITHUB Username : " GITHUB_USERNAME
+# echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
+# read -p "👉 Enter the GITHUB PAT with edit access to repo : " GITHUB_PAT
+# read -p "👉  Enter GITHUB Username : " GITHUB_USERNAME
 
-read -p "How many Environments do you want? " NUMBER
 count=1
-while [ $count -le $NUMBER ]; do
+while [ $count -le $NUM_ENV ]; do
   echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
   echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
   echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
  
   read -p "👉 Enter name for environment $count: " ENV_NAME
-  ENV_FILE="$SCRIPT_DIR/env/$PATCHER_NAME/${ENV_NAME}-${PATCHER_NAME}.env.sh"
+  ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].environmentName")
+  GIT_REPO=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].gitRepo")
+  HELM_VALUES_PATH=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].helmValuesPath")
+  MODE=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].mode")
+  BRANCH=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].branch")
+  GITHUB_PAT=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].githubPAT")
+  GITHUB_USERNAME=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].githubUsername")
+
+
+  ENV_FILE="$SCRIPT_DIR/env/$PROJ_NAME/${ENV_NAME}-${PROJ_NAME}.env.sh"
 
   # Get Inputs
-  read -p "👉 Enter the DOCKER IMAGE : " DOCKER_IMAGE
-  read -p "👉 Enter the GIT REPO : " GIT_REPO
-  read -p "👉 Enter the HELM VALUES PATH : " HELM_VALUES_PATH
-  read -p "👉 Enter the MODE : (auto/manual) " MODE
-  read -p "👉 Enter the BRANCH : " BRANCH
+  # read -p "👉 Enter the DOCKER IMAGE : " DOCKER_IMAGE
+  # read -p "👉 Enter the GIT REPO : " GIT_REPO
+  # read -p "👉 Enter the HELM VALUES PATH : " HELM_VALUES_PATH
+  # read -p "👉 Enter the MODE : (auto/manual) " MODE
+  # read -p "👉 Enter the BRANCH : " BRANCH
   WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
   # Create the environment file
   cat << EOF > "$ENV_FILE"
@@ -45,43 +56,43 @@ EOF
   chmod +x "$ENV_FILE"
    # Create Runner Scripts
   if [ "$MODE" == "auto" ]; then
-    mkdir -p "$SCRIPT_DIR/runners/${PATCHER_NAME}/auto"
+    mkdir -p "$SCRIPT_DIR/runners/${PROJ_NAME}/auto"
 
-    RUNNER_FILE="$SCRIPT_DIR/runners/${PATCHER_NAME}/auto/${ENV_NAME}-${PATCHER_NAME}-runner.sh"
+    RUNNER_FILE="$SCRIPT_DIR/runners/${PROJ_NAME}/auto/${ENV_NAME}-${PROJ_NAME}-runner.sh"
 
     cat << EOF > "$RUNNER_FILE"
 #!/bin/bash
-# Runner for ${ENV_NAME}-${PATCHER_NAME}
+# Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/auto-patcher.sh" "$ENV_FILE" \
-    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PATCHER_NAME}-auto-patcher.log" 2>&1 &
+    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-auto-patcher.log" 2>&1 &
 EOF
     chmod +x "$RUNNER_FILE"
     sleep 4
     # "$RUNNER_FILE"
 
   else
-    mkdir -p "$SCRIPT_DIR/runners/${PATCHER_NAME}/manual"
+    mkdir -p "$SCRIPT_DIR/runners/${PROJ_NAME}/manual"
 
-    RUNNER_FILE="$SCRIPT_DIR/runners/${PATCHER_NAME}/manual/${ENV_NAME}-${PATCHER_NAME}-runner.sh"
+    RUNNER_FILE="$SCRIPT_DIR/runners/${PROJ_NAME}/manual/${ENV_NAME}-${PROJ_NAME}-runner.sh"
 
     cat << EOF > "$RUNNER_FILE"
 #!/bin/bash
-# Runner for ${ENV_NAME}-${PATCHER_NAME}
+# Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/manual-patcher.sh" "$ENV_FILE" \
-    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PATCHER_NAME}-manual-patcher.log" 2>&1 &
+    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-manual-patcher.log" 2>&1 &
 EOF
     chmod +x "$RUNNER_FILE"
   fi
-  mkdir -p "$SCRIPT_DIR/runners/${PATCHER_NAME}/dual"
-  DUAL_RUNNER_FILE="$SCRIPT_DIR/runners/${PATCHER_NAME}/dual/${ENV_NAME}-${PATCHER_NAME}-runner.sh"
+  mkdir -p "$SCRIPT_DIR/runners/${PROJ_NAME}/dual"
+  DUAL_RUNNER_FILE="$SCRIPT_DIR/runners/${PROJ_NAME}/dual/${ENV_NAME}-${PROJ_NAME}-runner.sh"
   cat << EOF > "$DUAL_RUNNER_FILE"
 #!/bin/bash
-# Runner for ${ENV_NAME}-${PATCHER_NAME}
+# Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/dual-patcher.sh" "$ENV_FILE" \
-    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PATCHER_NAME}-dual-patcher.log" 2>&1 &
+    > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-dual-patcher.log" 2>&1 &
 EOF
   chmod +x "$RUNNER_FILE"
 

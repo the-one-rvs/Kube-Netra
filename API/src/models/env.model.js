@@ -3,7 +3,7 @@ import { Schema }from "mongoose";
 import { ApiError } from "../utils/ApiError.js";
 
 const environmentSchema = new Schema({
-    ennvironmentName: {
+    environmentName: {
         type: String,
         required: true,
         trim: true
