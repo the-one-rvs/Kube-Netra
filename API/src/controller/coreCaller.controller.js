@@ -3,7 +3,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Project } from "../models/project.model.js";
 import { GithubPAT } from "../models/githubPAT.model.js";
 import { Environment } from "../models/env.model.js";
-import { spawn } from "child_process";
+import { spawn, exec } from "child_process";
+import { ApiResponse } from "../utils/ApiResponse.js";
+
+const execAsync = promisify(exec);
 
 const callWorkflow = asyncHandler(async(req, res) => {
     try {
@@ -35,8 +38,10 @@ const callWorkflow = asyncHandler(async(req, res) => {
         }
 
         const full_proj_details = JSON.stringify(final_proj_details)
+
+        await execAsync("chmod +x ../core/workflow.sh");
         
-        const child = spawn("../core/cli-workflow.sh", [], {
+        const child = spawn("../core/workflow.sh", [], {
             cwd: "../core",
             env: {
                 ...process.env,
@@ -62,6 +67,9 @@ const callWorkflow = asyncHandler(async(req, res) => {
             console.log(`child process exited with code ${code}`);
         });
         
+        return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Workflow triggered successfully"))
     } catch (error) {
         throw new ApiError(400, error?.message)
     }

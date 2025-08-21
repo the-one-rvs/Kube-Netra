@@ -6,3 +6,5 @@ logs
 .git-credentials
 patcher/repos
 detector
+install.sh
+kube-netra
