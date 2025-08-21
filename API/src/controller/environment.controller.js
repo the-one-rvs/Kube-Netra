@@ -16,7 +16,7 @@ const createEnvironment = asyncHandler(async(req, res) => {
             branch
         } = req.body
 
-        if (!environmentName || !environmentNumber || !gitRepo || !helmValuePath || !mode || !branch) {
+        if (!environmentName || !gitRepo || !helmValuePath || !mode || !branch) {
             throw new ApiError(404, "All fields are required")
         }
 
@@ -29,21 +29,26 @@ const createEnvironment = asyncHandler(async(req, res) => {
         }
 
         const environment = await Environment.create({
-            environmentName,
+            environmentName: environmentName,
             projectId: req.project._id,
-            gitRepo,
-            helmValuePath,
-            mode,
-            branch
+            gitRepo: gitRepo,
+            helmValuePath: helmValuePath,
+            mode: mode,
+            branch: branch
         })
-
-        const proj = await Project.findById(req.project._id)
-        proj.environments.push(environment._id)
-        await proj.save()
 
         if (!environment) {
             throw new ApiError(400, "Environment not created")
         }
+
+        const proj = await Project.findById(req.project._id)
+        if(!proj) {
+            throw new ApiError(400, "Project not found")
+        }
+        proj.environments.push(environment._id)
+        await proj.save()
+
+        
         return res
         .status(200)
         .json ( new ApiResponse(200, environment, "Environment Created"))

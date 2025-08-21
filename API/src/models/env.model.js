@@ -9,8 +9,7 @@ const environmentSchema = new Schema({
         trim: true
     },
     environmentNumber: {
-        type: Number,
-        required: true
+        type: Number
     },
     projectId: {
         type: Schema.Types.ObjectId,

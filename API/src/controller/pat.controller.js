@@ -1,14 +1,15 @@
 import { GithubPAT } from "../models/githubPAT.model.js";
 import { Project } from "../models/project.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const addPAT = asyncHandler(async(req, res) => {
     try {
         
-        const {nameofPAT, githubUsername, githubPAT} = req.body
+        const {nameOfPAT, githubUsername, githubPAT} = req.body
 
-        if (!nameofPAT || !githubUsername || !githubPAT) {
+        if (!nameOfPAT || !githubUsername || !githubPAT) {
             throw new ApiError(404, "All fields are required")
         }
 
@@ -17,10 +18,14 @@ const addPAT = asyncHandler(async(req, res) => {
         }
 
         const pat = await GithubPAT.create({
-            nameOfPAT: nameofPAT,
+            nameOfPAT: nameOfPAT,
             githubUsername: githubUsername,
             githubPAT: githubPAT
         })
+
+        return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "PAT added successfully"))
 
     } catch (error) {
         throw new ApiError(400, error?.message)
@@ -40,7 +45,7 @@ const addPATinProject = asyncHandler(async(req, res) => {
             throw new ApiError(400, "PAT name is required")
         }
 
-        const githubPAT = await GithubPAT.findOne({ nameOfPAT })
+        const githubPAT = await GithubPAT.findOne({ nameOfPAT: nameOfPAT })
         if (!githubPAT) {
             throw new ApiError(400, "PAT not found")
         }

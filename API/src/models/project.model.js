@@ -43,10 +43,12 @@ const projectSchema = new Schema({
             message: "DockerHub PAT is required when imageType is private"
         }
     },
-    environment: {
-        type: Schema.Types.ObjectId,
-        ref: "Environment"
-    },
+    environments: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Environment"
+        }
+    ],
     dockerhubUsername: {
         type: String,
         validate: {

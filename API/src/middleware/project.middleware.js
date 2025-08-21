@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 export const verifyProject = asyncHandler(async(req, res, next) => {
-    const { projectToken } = req.cookies?.projectToken
+    const projectToken = req.cookies?.projectToken
 
     if (!projectToken) {
         throw new ApiError(401, "Unauthorized request")

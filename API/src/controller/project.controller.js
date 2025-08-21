@@ -21,7 +21,7 @@ const createProject = asyncHandler(async(req, res) => {
             throw new ApiError(400, "Unauthorized request")
         }
 
-        if (!name || !dockerImage || !poolInterval || !imageType || !githubUsername || !githubPAT) {
+        if (!name || !dockerImage || !poolInterval || !imageType) {
             throw new ApiError(400, "All fields are required")
         }
         if (imageType === "private" && !dockerhubPAT) {

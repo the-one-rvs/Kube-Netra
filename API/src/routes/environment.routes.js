@@ -10,13 +10,14 @@ import {
 } from "../controller/environment.controller.js";
 import { requireAnyPermission } from "../middleware/requirePermissions.middleware.js";
 import { validateGitHubRepo } from "../middleware/checkGitHubRepo.middleware.js";
+import { checkForGithubPAT } from "../middleware/checkforPAT.middleware.js";
 
 
 const router = Router();
 
 router
 .route("/createEnvironment")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_create_environment", "access_full_project", "access_full_environment"), validateGitHubRepo, createEnvironment)
+.post(verifyJWT, verifyProject, requireAnyPermission("admin", "access_create_environment", "access_full_project", "access_full_environment"), checkForGithubPAT, validateGitHubRepo, createEnvironment)
 
 router
 .route("/getEnvironment/:projectId/:environmentNumber")

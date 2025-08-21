@@ -11,11 +11,11 @@ export const validateDockerImage = async (req, res, next) => {
 
         if (dockerImage && imageType === "public") {
             const [registry, imageName] = dockerImage.split("/");
-            const [repo, tag = "latest"] = imageName.split(":");
+            // const [repo, tag = "latest"] = imageName.split(":");
 
             try {
                 await axios.get(
-                    `https://hub.docker.com/v2/repositories/${registry}/${repo}/tags/${tag}`
+                    `https://hub.docker.com/v2/repositories/${registry}/${imageName}`
                 );
             } catch (err) {
                 throw new ApiError(404, `Docker image ${dockerImage} not found`);
@@ -24,11 +24,11 @@ export const validateDockerImage = async (req, res, next) => {
 
         if (dockerImage && imageType === "private") {
             const [registry, imageName] = dockerImage.split("/");
-            const [repo, tag = "latest"] = imageName.split(":");
+            // const [repo, tag = "latest"] = imageName.split(":");
 
             try {
                 await axios.get(
-                    `https://hub.docker.com/v2/repositories/${registry}/${repo}/tags/${tag}`,
+                    `https://hub.docker.com/v2/repositories/${registry}/${imageName}`,
                     {
                         headers: {
                             "Authorization": `Bearer ${dockerhubPAT}`
