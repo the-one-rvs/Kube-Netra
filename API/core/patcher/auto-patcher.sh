@@ -16,6 +16,8 @@ fi
 # Derive project name
 DOCKER_PROJECT_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
+git config pull.rebase true
+
 # Paths
 if [ ! -f "$LATEST_TAG_PATH" ]; then
   echo "❌ Latest tag file not found at $LATEST_TAG_PATH. Ensure the watcher is running."
@@ -51,7 +53,13 @@ if [ ! -d "$TMP_DIR/.git" ]; then
   git clone -b "$BRANCH" "$GIT_REPO_URL" . 
 else
   echo "⏳ Pulling latest changes for $BRANCH..."
-  git  pull origin "$BRANCH"
+  git fetch origin "$BRANCH"
+  git rebase origin/"$BRANCH" || {
+    echo "❌ Rebase failed. Aborting..."
+    git rebase --abort
+    exit 1
+  }
+
 fi
 
 echo "🚀 Auto-Patcher started for $DOCKER_PROJECT_NAME..."
@@ -62,18 +70,24 @@ while true; do
   NEW_TAG=$(head -n 1 "$LATEST_TAG_PATH")
   CURRENT_TAG=$(grep "tag:" "$TMP_DIR/$HELM_VALUES_PATH" | awk '{print $2}')
 
-  git  pull origin "$BRANCH"
+  git fetch origin "$BRANCH"
+  git rebase origin/"$BRANCH" || {
+    echo "❌ Rebase failed. Aborting..."
+    git rebase --abort
+    exit 1
+  }
+
 
   sleep 5
 
   if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
     echo "🎉 New tag detected: $NEW_TAG (Previous: $CURRENT_TAG)"
     sed -i "s/tag:.*/tag: $NEW_TAG/" "$TMP_DIR/$HELM_VALUES_PATH"
-    git  pull origin "$BRANCH"
+    # git  pull origin "$BRANCH"
     git  add "$HELM_VALUES_PATH"
     git  commit -m "🤖 Kube-Netra auto patch: updated tag to $NEW_TAG"
 
-    git  push origin "$BRANCH"
+    git push --force-with-lease origin "$BRANCH"
 
     echo "✅ Changes pushed to $BRANCH."
   else

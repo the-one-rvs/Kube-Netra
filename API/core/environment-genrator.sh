@@ -19,14 +19,22 @@ while [ $count -le $NUM_ENV ]; do
   echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
   echo "🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥🖥"
  
-  read -p "👉 Enter name for environment $count: " ENV_NAME
-  ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].environmentName")
-  GIT_REPO=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].gitRepo")
-  HELM_VALUES_PATH=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].helmValuesPath")
-  MODE=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].mode")
-  BRANCH=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].branch")
-  GITHUB_PAT=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].githubPAT")
-  GITHUB_USERNAME=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].githubUsername")
+  # read -p "👉 Enter name for environment $count: " ENV_NAME
+  ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].environmentName")
+  GIT_REPO=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].gitRepo")
+  HELM_VALUES_PATH=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].helmValuePath")
+  MODE=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].mode")
+  BRANCH=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].branch")
+  GITHUB_PAT=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].githubPAT")
+  GITHUB_USERNAME=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].githubUsername")
+
+  echo "👉 Environment Name: $ENV_NAME"
+  echo "👉 Git Repo: $GIT_REPO"
+  echo "👉 Helm Values Path: $HELM_VALUES_PATH"
+  echo "👉 Mode: $MODE"
+  echo "👉 Branch: $BRANCH"
+  echo "👉 GITHUB_PAT: $GITHUB_PAT"
+  echo "👉 GITHUB_USERNAME: $GITHUB_USERNAME"
 
 
   ENV_FILE="$SCRIPT_DIR/env/$PROJ_NAME/${ENV_NAME}-${PROJ_NAME}.env.sh"

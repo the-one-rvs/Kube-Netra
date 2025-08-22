@@ -11,6 +11,8 @@ $SCRIPT_DIR/watcher-genrator.sh "$DOCKER_IMAGE" "$POLL_INTERVAL" "$ACCESS_TYPE" 
 
 echo "🐳 Docker Image: $DOCKER_IMAGE"
 
+echo "ENV_DETAILS: $ENV_DETAILS"
+
 WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
 
@@ -37,9 +39,14 @@ echo "==========================================================================
 echo "=================================================================================================================="
 
 #size of env details
-NUM_ENV=$(echo "$ENV_DETAILS" | jq '. | length')
+NUM_ENV=$(echo "$ENV_DETAILS" | jq '.environments | length')
+echo "Total number of envs: $NUM_ENV"
 
-$SCRIPT_DIR/environment-genrator.sh "$ENV_DETAILS" "$NUM_ENV" "$PROJ_NAME" "$DOCKER_IMAGE"
+$SCRIPT_DIR/environment-genrator.sh "$ENV_DETAILS" "$NUM_ENV" "$PROJ_NAME" "$DOCKER_IMAGE" >> "$SCRIPT_DIR/logs/environment-genrator.log" 2>&1
+
+echo "Environment Generator Script initiated"
+
+ENV_FOLDER="$SCRIPT_DIR/env/$PROJ_NAME"
 
 ENV_COUNT=$(find "$ENV_FOLDER" -type f -name "*.env.sh" | wc -l)
 echo "Total number of env files: $ENV_COUNT"
@@ -65,7 +72,7 @@ runner_mode_vec=()
 
 count=1
 while [ $count -le $NUM_ENV ]; do
-    ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".[$((count-1))].environmentName")
+    ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].environmentName")
     selected_envs+=("$ENV_NAME")
     count=$((count + 1))
 done

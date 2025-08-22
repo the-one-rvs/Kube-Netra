@@ -5,6 +5,15 @@ import { GithubPAT } from "../models/githubPAT.model.js";
 import { Environment } from "../models/env.model.js";
 import { spawn, exec } from "child_process";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { promisify } from "util";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const scriptPath = path.join(__dirname, "../../core/workflow.sh");
+
 
 const execAsync = promisify(exec);
 
@@ -20,7 +29,8 @@ const callWorkflow = asyncHandler(async(req, res) => {
         for (let i = 0; i < envs.length; i++) {
             const env = envs[i];
             const env_details = await Environment.findById(env._id).lean();
-            const githubPAT = await GithubPAT.findOne({nameOfPAT: env_details.nameOfGithubPAT}).select("githubPAT githubUsername").lean();
+            const githubPAT = await GithubPAT.findOne({nameOfPAT: proj.nameOfGithubPAT}).lean();
+            console.log(githubPAT)
             const enrichedEnvironment = {
                 ...env_details,
                 dockerImage: proj.dockerImage,
@@ -39,20 +49,23 @@ const callWorkflow = asyncHandler(async(req, res) => {
 
         const full_proj_details = JSON.stringify(final_proj_details)
 
-        await execAsync("chmod +x ../core/workflow.sh");
+        console.log(full_proj_details)
+
+        // await execAsync("chmod +x ../../core/workflow.sh");
+
+        const env = {
+            ...process.env, // apna current env bhi preserve karna
+            PROJ_NAME: req.project.name,
+            DOCKER_IMAGE: req.project.dockerImage,
+            POLL_INTERVAL: req.project.poolInterval,
+            ACCESS_TYPE: req.project.accessType || "public",
+            ENV_DETAILS: full_proj_details, // array to string
+        };
         
-        const child = spawn("../core/workflow.sh", [], {
-            cwd: "../core",
-            env: {
-                ...process.env,
-                PROJ_NAME: full_proj_details.name,
-                DOCKER_IMAGE: full_proj_details.dockerImage,
-                POLL_INTERVAL: full_proj_details.poolInterval,
-                ACCESS_TYPE: full_proj_details.imageType,
-                TOKEN: full_proj_details.imageType === "private" ? full_proj_details.dockerhubPAT : "",
-                USERNAME: full_proj_details.imageType === "private" ? full_proj_details.dockerhubUsername : "",
-                ENV_DETAILS: JSON.stringify(full_proj_details.environments)
-            }
+        const child = spawn(scriptPath, {
+            env,
+            cwd: path.resolve("core"),
+            shell: true
         });
 
         child.stdout.on("data", (data) => {
