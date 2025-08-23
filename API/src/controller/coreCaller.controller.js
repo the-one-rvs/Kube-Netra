@@ -15,6 +15,7 @@ const __dirname = path.dirname(__filename);
 
 const scriptPath = path.join(__dirname, "../../core/workflow.sh");
 const cleanupScriptPath = path.join(__dirname, "../../core/cleanup.sh");
+const logDir = path.join(__dirname, "../..core/logs");
 
 const execAsync = promisify(exec);
 
@@ -149,9 +150,10 @@ const streamWatcherLogs = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Workflow not triggered")
   }
 
-  const safeDockerImage = req.project.dockerImage.replace(/\//g, ":");
+  const safeDockerImage = req.project.dockerImage.replace(/\//g, "-").replace(/:/g, "-");
   const watcher_logs_file = path.join(__dirname, `../../core/logs/${safeDockerImage}-watch.sh.log`);
   if (!fs.existsSync(watcher_logs_file)) {
+    console.log(watcher_logs_file)
     throw new ApiError(400, "Watcher logs file not found");
   }
 
@@ -183,7 +185,7 @@ const streamWatcherLogs = asyncHandler(async (req, res) => {
 
 const streamPatcherLogs = asyncHandler(async (req, res) => {
   
-  const {envId} = req.paramas
+  const { envId } = req.params;
 
   if (!req.user){
     throw new ApiError(404, "Unauthorized request")
@@ -197,8 +199,8 @@ const streamPatcherLogs = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Workflow not triggered")
   }
 
-  if (!env) {
-      throw new ApiError(404, "Environment not found")
+  if (!envId) {
+    throw new ApiError(400, "Environment ID not provided")
   }
 
   res.setHeader("Content-Type", "text/event-stream");
@@ -286,10 +288,39 @@ const stopWorkflow = asyncHandler(async (req, res) => {
   }
 })
 
+const enableLogCleaner = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user){
+      throw new ApiError(404, "Unauthorized request")
+    }
+    if (!req.project) {
+      throw new ApiError(404, "Project not found")
+    }
+    if (req.project.isWorkflowTriggered===false || !req.project.isWorkflowTriggered) {
+      throw new ApiError(400, "Workflow not triggered")
+    }
+
+    cron.schedule("0 0 * * *", () => {
+    fs.readdirSync(logDir).forEach(file => {
+        if (file.endsWith(".log")) {
+        fs.writeFileSync(path.join(logDir, file), ""); // empty the file
+        }
+    });
+    console.log("✅ Logs cleaned:", new Date().toISOString());
+    });
+    return res.status(200)
+    .json(new ApiResponse(200, {}, "Logs cleaner enabled successfully"))
+
+  } catch (error) {
+    throw new ApiError(400, error?.message)
+  }
+})
+
 export{
     callWorkflow,
     streamWorkflowLogs,
     streamWatcherLogs,
     streamPatcherLogs,
-    stopWorkflow
+    stopWorkflow,
+    enableLogCleaner
 }

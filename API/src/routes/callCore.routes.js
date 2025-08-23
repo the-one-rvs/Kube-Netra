@@ -2,7 +2,7 @@ import { Router } from "express";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { verifyProject } from "../middleware/project.middleware.js";
 import { requireAnyPermission } from "../middleware/requirePermissions.middleware.js";
-import { callWorkflow, stopWorkflow, streamPatcherLogs, streamWatcherLogs, streamWorkflowLogs } from "../controller/coreCaller.controller.js";
+import { callWorkflow, enableLogCleaner, stopWorkflow, streamPatcherLogs, streamWatcherLogs, streamWorkflowLogs } from "../controller/coreCaller.controller.js";
 
 
 const router = Router();
@@ -21,5 +21,8 @@ router.route("/logs/watcher")
 
 router.route("/logs/patcher/:envId")
 .get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), streamPatcherLogs);
+
+router.route("/logsCleaner")
+.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), enableLogCleaner);                      
 
 export default router;
