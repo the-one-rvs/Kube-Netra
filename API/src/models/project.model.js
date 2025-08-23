@@ -60,6 +60,10 @@ const projectSchema = new Schema({
             },
             message: "DockerHub username is required when imageType is private"
         }
+    },
+    isWorkflowTriggered: {
+        type: Boolean,
+        default: false
     }
 
 }, {

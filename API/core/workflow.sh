@@ -11,7 +11,6 @@ $SCRIPT_DIR/watcher-genrator.sh "$DOCKER_IMAGE" "$POLL_INTERVAL" "$ACCESS_TYPE" 
 
 echo "🐳 Docker Image: $DOCKER_IMAGE"
 
-echo "ENV_DETAILS: $ENV_DETAILS"
 
 WATCHER_NAME=$(echo "$DOCKER_IMAGE" | sed 's/\//-/g')
 
@@ -27,8 +26,12 @@ echo $WATCHER_FILE
 LOG_FILE_LOCATION="${WATCHER_NAME}-watch.sh"
 
 mkdir -p $SCRIPT_DIR/logs
+mkdir -p $SCRIPT_DIR/pid
+mkdir -p $SCRIPT_DIR/pid/${PROJ_NAME}
 
 nohup $WATCHER_FILE > $SCRIPT_DIR/logs/$LOG_FILE_LOCATION.log 2>&1 &
+WATCHER_PID=$!
+echo $WATCHER_PID > "$SCRIPT_DIR/pid/${PROJ_NAME}/${WATCHER_NAME}-watcher.pid"
 echo "Watcher Started ! Logs at ${SCRIPT_DIR}/logs/${LOG_FILE_LOCATION}.log"
 
 TAG_FILE="\$SCRIPT_DIR/tags/list/${PROJ_NAME}-tags.txt"
@@ -125,12 +128,36 @@ while true; do
 
         echo "📤 Signal processed and removed. Exiting."
 
-        # pkill -f $WATCHER_FILE
-        pkill -f $SCRIPT_DIR/patcher/auto-patcher.sh
-        pkill -f $SCRIPT_DIR/patcher/manual-patcher.sh
+        AUTO_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-auto-patcher.pid"
+        DUAL_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-dual-patcher.pid"
+        MANUAL_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-manual-patcher.pid"
+
+        if [[ -f "$AUTO_PATCHER_PID_FILE" ]]; then
+            AUTO_PATCHER_PID=$(cat "$AUTO_PATCHER_PID_FILE")
+            echo "🚫 Killing Auto Patcher: $AUTO_PATCHER_PID"
+            kill "$AUTO_PATCHER_PID"
+            rm -f "$AUTO_PATCHER_PID_FILE"
+        fi
+
+        if [[ -f "$DUAL_PATCHER_PID_FILE" ]]; then
+            DUAL_PATCHER_PID=$(cat "$DUAL_PATCHER_PID_FILE")
+            echo "🚫 Killing Dual Patcher: $DUAL_PATCHER_PID"
+            kill "$DUAL_PATCHER_PID"
+            rm -f "$DUAL_PATCHER_PID_FILE"
+        fi
+
+        if [[ -f "$MANUAL_PATCHER_PID_FILE" ]]; then
+            MANUAL_PATCHER_PID=$(cat "$MANUAL_PATCHER_PID_FILE")
+            echo "🚫 Killing Manual Patcher: $MANUAL_PATCHER_PID"
+            kill "$MANUAL_PATCHER_PID"
+            rm -f "$MANUAL_PATCHER_PID_FILE"
+        fi
     else
         echo "🕵️ Still waiting... ($DETECTOR_SIGNAL not found)"
         sleep 5
     fi
 done
 ) > "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log" 2>&1 & disown
+WORKFLOW_PID=$!
+echo $WORKFLOW_PID > "$SCRIPT_DIR/pid/${PROJ_NAME}/$PROJ_NAME-workflow.pid"
+echo "Workflow Started (PID: $WORKFLOW_PID)"

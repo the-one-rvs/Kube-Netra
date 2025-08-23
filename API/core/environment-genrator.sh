@@ -28,13 +28,16 @@ while [ $count -le $NUM_ENV ]; do
   GITHUB_PAT=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].githubPAT")
   GITHUB_USERNAME=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].githubUsername")
 
-  echo "👉 Environment Name: $ENV_NAME"
-  echo "👉 Git Repo: $GIT_REPO"
-  echo "👉 Helm Values Path: $HELM_VALUES_PATH"
-  echo "👉 Mode: $MODE"
-  echo "👉 Branch: $BRANCH"
-  echo "👉 GITHUB_PAT: $GITHUB_PAT"
-  echo "👉 GITHUB_USERNAME: $GITHUB_USERNAME"
+  # echo "👉 Environment Name: $ENV_NAME"
+  # echo "👉 Git Repo: $GIT_REPO"
+  # echo "👉 Helm Values Path: $HELM_VALUES_PATH"
+  # echo "👉 Mode: $MODE"
+  # echo "👉 Branch: $BRANCH"
+  # echo "👉 GITHUB_PAT: $GITHUB_PAT"
+  # echo "👉 GITHUB_USERNAME: $GITHUB_USERNAME"
+
+
+  mkdir -p "$SCRIPT_DIR/pid/${PROJ_NAME}/${ENV_NAME}"
 
 
   ENV_FILE="$SCRIPT_DIR/env/$PROJ_NAME/${ENV_NAME}-${PROJ_NAME}.env.sh"
@@ -74,6 +77,8 @@ EOF
 mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/auto-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-auto-patcher.log" 2>&1 &
+AUTO_PATCHER_PID=\$!
+echo \$AUTO_PATCHER_PID > "$SCRIPT_DIR/pid/${PROJ_NAME}/${ENV_NAME}/$ENV_NAME-auto-patcher.pid"
 EOF
     chmod +x "$RUNNER_FILE"
     sleep 4
@@ -90,6 +95,8 @@ EOF
 mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/manual-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-manual-patcher.log" 2>&1 &
+MANUAL_PATCHER_PID=\$!
+echo \$MANUAL_PATCHER_PID > "$SCRIPT_DIR/pid/${PROJ_NAME}/${ENV_NAME}/$ENV_NAME-manual-patcher.pid"
 EOF
     chmod +x "$RUNNER_FILE"
   fi
@@ -101,8 +108,10 @@ EOF
 mkdir -p $SCRIPT_DIR/logs
 nohup "$SCRIPT_DIR/patcher/dual-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-dual-patcher.log" 2>&1 &
+DUAL_PATCHER_PID=\$!
+echo \$DUAL_PATCHER_PID > "$SCRIPT_DIR/pid/${PROJ_NAME}/${ENV_NAME}/$ENV_NAME-dual-patcher.pid"
 EOF
-  chmod +x "$RUNNER_FILE"
+  chmod +x "$DUAL_RUNNER_FILE"
 
   count=$((count + 1))
 done

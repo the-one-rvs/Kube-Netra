@@ -90,6 +90,9 @@ while true; do
     git push --force-with-lease origin "$BRANCH"
 
     echo "✅ Changes pushed to $BRANCH."
+
+    cd ..
+    rm -rf "$TMP_DIR"
   else
     echo "ℹ️ No new tag. Current tag is still: $CURRENT_TAG."
   fi

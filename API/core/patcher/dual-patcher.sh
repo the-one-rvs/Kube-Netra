@@ -79,6 +79,8 @@ if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
   git -C "$TMP_DIR" push origin "$BRANCH"
 
   echo "✅ Tag updated to $SELECTED_TAG and pushed to $BRANCH."
+  cd ..
+  rm -rf "$TMP_DIR"
 else
   echo "❌ Patch skipped."
 fi
