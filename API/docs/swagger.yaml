@@ -7,6 +7,20 @@ info:
 servers:
   - url: http://localhost:8000/api/v1
 
+tags:
+  - name: User
+    description: User management and authentication
+  - name: Project
+    description: Project management
+  - name: Environment
+    description: Environment management
+  - name: PAT
+    description: Personal Access Token management
+  - name: Permissions
+    description: User permissions management
+  - name: Core
+    description: Core/Workflow and system operations
+
 components:
   securitySchemes:
     CookieAuth:
@@ -64,15 +78,25 @@ paths:
     post:
       summary: Create the root admin
       tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                email: { type: string }
+                fullname: { type: string }
+                password: { type: string }
       responses:
-        "201": { description: Root admin created }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "200": { description: Root admin created }
+        "400": { $ref: "#/components/responses/ServerError" }
 
   /users/register:
     post:
       summary: Register a new user
       tags: [User]
-      security: []
       requestBody:
         required: true
         content:
@@ -80,18 +104,21 @@ paths:
             schema:
               type: object
               properties:
+                username: { type: string }
                 email: { type: string }
+                fullname: { type: string }
                 password: { type: string }
-                name: { type: string }
+                permissions:
+                  type: array
+                  items: { type: string }
       responses:
-        "201": { description: User registered }
-        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "200": { description: User registered }
+        "400": { $ref: "#/components/responses/ServerError" }
 
   /users/login:
     post:
       summary: Login user
       tags: [User]
-      security: []
       requestBody:
         required: true
         content:
@@ -100,10 +127,11 @@ paths:
               type: object
               properties:
                 email: { type: string }
+                username: { type: string }
                 password: { type: string }
       responses:
         "200": { description: Logged in successfully }
-        "401": { $ref: "#/components/responses/UnauthorizedError" }
+        "400": { $ref: "#/components/responses/ServerError" }
 
   /users/logout:
     get:
@@ -111,19 +139,13 @@ paths:
       tags: [User]
       responses:
         "200": { description: Logged out }
-        "401": { $ref: "#/components/responses/UnauthorizedError" }
 
   /users/currentUser:
     get:
       summary: Get current user
       tags: [User]
       responses:
-        "200":
-          description: Current user details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
+        "200": { description: Current user details }
 
   /users/allUsers:
     get:
@@ -150,7 +172,8 @@ paths:
             schema:
               type: object
               properties:
-                name: { type: string }
+                fullname: { type: string }
+                username: { type: string }
                 email: { type: string }
       responses:
         "200": { description: User updated }
@@ -175,14 +198,6 @@ paths:
     delete:
       summary: Delete a user
       tags: [User]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId: { type: string }
       responses:
         "200": { description: User deleted }
 
@@ -205,7 +220,9 @@ paths:
               type: object
               properties:
                 userId: { type: string }
-                permission: { type: string }
+                newPermissions:
+                  type: array
+                  items: { type: string }
       responses:
         "200": { description: Permission added }
 
@@ -221,7 +238,9 @@ paths:
               type: object
               properties:
                 userId: { type: string }
-                permission: { type: string }
+                permissionsToRemove:
+                  type: array
+                  items: { type: string }
       responses:
         "200": { description: Permission removed }
 
@@ -237,9 +256,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Project"
+              type: object
+              properties:
+                name: { type: string }
+                dockerImage: { type: string }
+                poolInterval: { type: number }
+                imageType: { type: string }
+                dockerhubPAT: { type: string }
+                dockerhubUsername: { type: string }
       responses:
-        "201": { description: Project created }
+        "200": { description: Project created }
 
   /project/enterProject/{projectId}:
     get:
@@ -269,7 +295,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Project"
+              type: object
+              properties:
+                name: { type: string }
+                dockerImage: { type: string }
+                poolInterval: { type: number }
+                imageType: { type: string }
+                githubUsername: { type: string }
+                githubPAT: { type: string }
+                dockerhubPAT: { type: string }
+                dockerhubUsername: { type: string }
       responses:
         "200": { description: Project updated }
 
@@ -277,14 +312,6 @@ paths:
     delete:
       summary: Delete a project
       tags: [Project]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                projectId: { type: string }
       responses:
         "200": { description: Project deleted }
 
@@ -314,9 +341,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Environment"
+              type: object
+              properties:
+                environmentName: { type: string }
+                gitRepo: { type: string }
+                helmValuePath: { type: string }
+                mode: { type: string }
+                branch: { type: string }
       responses:
-        "201": { description: Environment created }
+        "200": { description: Environment created }
 
   /environment/getEnvironment/{projectId}/{environmentNumber}:
     get:
@@ -334,16 +367,27 @@ paths:
       responses:
         "200": { description: Environment details }
 
-  /environment/updateEnvironment:
+  /environment/updateEnvironment/{environmentId}:
     patch:
       summary: Update an environment
       tags: [Environment]
+      parameters:
+        - name: environmentId
+          in: path
+          required: true
+          schema: { type: string }
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Environment"
+              type: object
+              properties:
+                environmentName: { type: string }
+                gitRepo: { type: string }
+                helmValuePath: { type: string }
+                mode: { type: string }
+                branch: { type: string }
       responses:
         "200": { description: Environment updated }
 
@@ -354,19 +398,15 @@ paths:
       responses:
         "200": { description: List of environments }
 
-  /environment/deleteEnvironment:
+  /environment/deleteEnvironment/{environmentId}:
     delete:
       summary: Delete environment
       tags: [Environment]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                projectId: { type: string }
-                environmentNumber: { type: integer }
+      parameters:
+        - name: environmentId
+          in: path
+          required: true
+          schema: { type: string }
       responses:
         "200": { description: Environment deleted }
 
@@ -388,12 +428,17 @@ paths:
                 githubUsername: { type: string }
                 githubPAT: { type: string }
       responses:
-        "201": { description: PAT added }
+        "200": { description: PAT added }
 
   /pat/showPATProjects:
     get:
       summary: Show projects linked to PAT
       tags: [PAT]
+      parameters:
+        - name: patId
+          in: query
+          required: true
+          schema: { type: string }
       responses:
         "200": { description: List of PAT projects }
 
@@ -408,8 +453,7 @@ paths:
             schema:
               type: object
               properties:
-                patId: { type: string }
-                projectId: { type: string }
+                nameOfPAT: { type: string }
       responses:
         "200": { description: PAT linked to project }
 
@@ -417,13 +461,72 @@ paths:
     delete:
       summary: Delete a GitHub PAT
       tags: [PAT]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                patId: { type: string }
+      parameters:
+        - name: patId
+          in: query
+          required: true
+          schema: { type: string }
       responses:
         "200": { description: PAT deleted }
+
+  ############################
+  # Core/Workflow Routes
+  ############################
+  /callCore/startWorkflow:
+    get:
+      summary: Start workflow for project
+      tags: [Core]
+      responses:
+        "200": { description: Workflow started }
+
+  /callCore/stopWorkflow:
+    get:
+      summary: Stop workflow for project
+      tags: [Core]
+      responses:
+        "200": { description: Workflow stopped }
+
+  /callCore/logs/workflow:
+    get:
+      summary: Stream workflow logs
+      tags: [Core]
+      responses:
+        "200": { description: Workflow logs stream }
+
+  /callCore/logs/watcher:
+    get:
+      summary: Stream watcher logs
+      tags: [Core]
+      responses:
+        "200": { description: Watcher logs stream }
+
+  /callCore/logs/patcher/{envId}:
+    get:
+      summary: Stream patcher logs for environment
+      tags: [Core]
+      parameters:
+        - name: envId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Patcher logs stream }
+
+  /callCore/logsCleaner:
+    get:
+      summary: Enable log cleaner
+      tags: [Core]
+      responses:
+        "200": { description: Log cleaner enabled }
+
+  /callCore/startManualPatcher/{environmentId}:
+    get:
+      summary: Start manual patcher for environment
+      tags: [Core]
+      parameters:
+        - name: environmentId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Manual patcher started }
