@@ -32,7 +32,7 @@ router
 .get(verifyJWT, verifyProject,requireAnyPermission("admin", "access_view_environment", "access_full_project", "access_full_environment"), getAllEnvironment)
 
 router
-.route("/deleteEnvironment")
+.route("/deleteEnvironment/:environmentId")
 .delete(verifyJWT, verifyProject,requireAnyPermission("admin", "access_delete_environment", "access_full_project", "access_full_environment"), deleteEnvironment)
 
 export default router

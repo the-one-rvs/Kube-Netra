@@ -39,14 +39,49 @@ const environmentSchema = new Schema({
 })
 
 
-environmentSchema.pre('save', async function(next) {
+environmentSchema.pre("validate", async function (next) {
     try {
-        this.environmentNumber = (await this.constructor.countDocuments({ projectId: this.projectId })) + 1;
+        if (this.isNew && !this.environmentNumber) {
+            const count = await this.constructor.countDocuments({ projectId: this.projectId });
+            this.environmentNumber = count + 1;
+        }
         next();
     } catch (error) {
-        throw new ApiError(400, error?.message)
+        next(new ApiError(400, error?.message));
     }
 });
+
+environmentSchema.post("findOneAndDelete", async function (doc) {
+    if (!doc) return;
+
+    try {
+        // STEP 1: Remove deleted env from Project
+        await mongoose.model("Project").findByIdAndUpdate(
+            doc.projectId,
+            { $pull: { environments: doc._id } }
+        );
+
+        // STEP 2: Fetch remaining envs sorted
+        const envs = await doc.constructor.find({ projectId: doc.projectId })
+            .sort("environmentNumber");
+
+        // STEP 3: Bulk reassign numbers
+        const bulkOps = envs.map((env, i) => ({
+            updateOne: {
+                filter: { _id: env._id },
+                update: { $set: { environmentNumber: i + 1 } }
+            }
+        }));
+
+        if (bulkOps.length > 0) {
+            await doc.constructor.bulkWrite(bulkOps);
+        }
+
+    } catch (error) {
+        console.error("Error handling environment deletion:", error.message);
+    }
+});
+
 
 
 export const Environment = mongoose.model("Environment", environmentSchema)

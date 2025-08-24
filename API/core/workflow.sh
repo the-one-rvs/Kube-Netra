@@ -73,12 +73,16 @@ echo "👉 Create the flow through the number of environment "
 runner_mode_vec=()
 #create selected envs array from ENV_DETAILS
 
-count=1
-while [ $count -le $NUM_ENV ]; do
-    ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].environmentName")
+# Get environments sorted by environmentNumber
+sorted_envs=$(echo "$ENV_DETAILS" | jq -c '.environments | sort_by(.environmentNumber)[]')
+
+selected_envs=()
+while IFS= read -r env; do
+    ENV_NAME=$(echo "$env" | jq -r '.environmentName')
     selected_envs+=("$ENV_NAME")
-    count=$((count + 1))
-done
+done <<< "$sorted_envs"
+
+echo "Selected Environments: ${selected_envs[@]}"
 
 for env in "${selected_envs[@]}"; do
     runner_file_auto="$SCRIPT_DIR/runners/$PROJ_NAME/auto/${env}-${PROJ_NAME}-runner.sh"

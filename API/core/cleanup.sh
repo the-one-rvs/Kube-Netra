@@ -28,7 +28,16 @@ fi
 
 # Remove logs
 rm -rf "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log"
-rm -rf "$SCRIPT_DIR/logs/$ENV_NAME-$PROJ_NAME-*.log"
-rm -rf "$SCRIPT_DIR/logs/$PROJ_NAME/$WATCHER_NAME-*.sh.log"
+rm -rf "$SCRIPT_DIR/logs/$PROJ_NAME/$WATCHER_NAME-watch.sh.log"
+rm -rf "$SCRIPT_DIR/env/$PROJ_NAME"
+rm -rf "$SCRIPT_DIR/runners/$PROJ_NAME"
+
+count=1
+ENV_COUNT=$(echo "$ENV_DETAILS" | jq '.environments | length')
+while [ $count -le $ENV_COUNT ]; do
+    ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].environmentName")
+    MODE=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].mode")
+    rm -rf "$SCRIPT_DIR/logs/$ENV_NAME-$PROJ_NAME-$MODE-patcher.log"
+done 
 
 echo "✅ Cleanup complete."

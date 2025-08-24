@@ -64,7 +64,7 @@ const deleteEnvironment = asyncHandler(async(req, res) => {
 
       if (!req.user) {
         throw new ApiError(404, "Unauthorized request")
-    }
+     }
 
         if (!req.project) {
             throw new ApiError(404, "Project not found")

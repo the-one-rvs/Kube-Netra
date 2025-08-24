@@ -9,6 +9,7 @@ import { promisify } from "util";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import e from "express";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,7 +37,7 @@ const callWorkflow = asyncHandler(async(req, res) => {
             const env = envs[i];
             const env_details = await Environment.findById(env._id).lean();
             const githubPAT = await GithubPAT.findOne({nameOfPAT: proj.nameOfGithubPAT}).lean();
-            console.log(githubPAT)
+            // console.log(githubPAT)
             const enrichedEnvironment = {
                 ...env_details,
                 dockerImage: proj.dockerImage,
@@ -252,10 +253,40 @@ const stopWorkflow = asyncHandler(async (req, res) => {
 
     await execAsync(`chmod +x ${cleanupScriptPath}`);
 
+    const proj = await Project.findById(req.project._id).lean();
+
+    const envs = proj.environments;
+
+    const all_env_details = new Array(envs.length);
+    
+    for (let i = 0; i < envs.length; i++) {
+        const env = envs[i];
+        const env_details = await Environment.findById(env._id).lean();
+        const githubPAT = await GithubPAT.findOne({nameOfPAT: proj.nameOfGithubPAT}).lean();
+        // console.log(githubPAT)
+        const enrichedEnvironment = {
+            ...env_details,
+            dockerImage: proj.dockerImage,
+            nameOfGithubPAT: proj.nameOfGithubPAT,
+            githubPAT: githubPAT?.githubPAT || null,
+            githubUsername: githubPAT?.githubUsername || null
+        };
+        const env_number = enrichedEnvironment.environmentNumber;
+        all_env_details[env_number-1] = enrichedEnvironment;
+    }
+
+    const final_proj_details = {
+        ...proj,
+        environments: all_env_details
+    }
+
+    const full_proj_details = JSON.stringify(final_proj_details)
+
     const env = {
         ...process.env, 
         PROJ_NAME: req.project.name,
-        DOCKER_IMAGE: req.project.dockerImage 
+        DOCKER_IMAGE: req.project.dockerImage, 
+        ENV_DETAILS: full_proj_details
     };
     
     const child = spawn(cleanupScriptPath, {
@@ -316,11 +347,64 @@ const enableLogCleaner = asyncHandler(async (req, res) => {
   }
 })
 
+const startManualPatcher = asyncHandler(async(req, res) => {
+  try {
+    if (!req.user){
+      throw new ApiError(404, "Unauthorized request")
+    }
+    if (!req.project) {
+      throw new ApiError(404, "Project not found")
+    }
+    if (req.project.isWorkflowTriggered===false || !req.project.isWorkflowTriggered) {
+      throw new ApiError(400, "Workflow not triggered")
+    }
+
+    const { environmentId } = req.params
+
+    if (!environmentId) {
+      throw new ApiError(400, "Environment ID not found")
+    }
+
+    const environment = await Environment.findById(environmentId)
+    if (!environment) {
+      throw new ApiError(404, "Environment not found")
+    }
+    if (environment.mode !== "manual") {
+      throw new ApiError(400, "Environment is not in manual mode")
+    }
+
+    const runner_file_manual = path.join(__dirname, `../../core/runners/${req.project.name}/manual/${environment.environmentName}-${req.project.name}-runner.sh`);
+
+    await execAsync(`chmod +x ${runner_file_manual}`);
+
+    if (!fs.existsSync(runner_file_manual)) {
+      throw new ApiError(404, "Runner file not found")
+    }
+
+    const child = spawn(runner_file_manual, {
+      cwd: path.resolve("core"),
+      shell: true,
+    });
+
+    child.stdout.on("data", (data) => console.log(`stdout: ${data}`));
+    child.stderr.on("data", (data) => console.error(`stderr: ${data}`));
+    child.on("error", (err) => console.error("Failed to start process:", err));
+    child.on("close", (code) => console.log(`child process exited with code ${code}`));
+
+    return res.status(200)
+    .json(new ApiResponse(200, runner_file_manual, "Patcher started successfully"))
+
+  } catch (error) {
+    throw new ApiError(400, error?.message)
+  }
+})
+
 export{
     callWorkflow,
     streamWorkflowLogs,
     streamWatcherLogs,
     streamPatcherLogs,
     stopWorkflow,
-    enableLogCleaner
+    enableLogCleaner,
+    startManualPatcher
 }
