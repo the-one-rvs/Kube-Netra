@@ -100,11 +100,17 @@ done
 echo "Starting runners sequentially..."
 (
 DETECTOR_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-new-tag"
+PENDING_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-pending-tag"
 echo "📡 Finding new tags. "
 
 while true; do
+    if [[ -f "$PENDING_SIGNAL" ]]; then
+        echo "🚨 Signal detected again."
+        mv "$PENDING_SIGNAL" "$DETECTOR_SIGNAL"
+    fi
     if [[ -f "$DETECTOR_SIGNAL" ]]; then
         echo "🚨 Signal detected. Proceeding with patchers..."
+        # rm -f "$PENDING_SIGNAL"
 
         for pair in "${runner_mode_vec[@]}"; do
             runner_file=$(echo "$pair" | awk '{print $1}')
@@ -129,8 +135,13 @@ while true; do
 
         sleep 30
         rm -f "$DETECTOR_SIGNAL"
+        echo "📤 Signal processed and removed."
 
-        echo "📤 Signal processed and removed. Exiting."
+        if [[ -f "$PENDING_SIGNAL" ]]; then
+            echo "🚨 Signal detected again."
+            mv "$PENDING_SIGNAL" "$DETECTOR_SIGNAL"
+        fi
+        
 
         AUTO_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-auto-patcher.pid"
         DUAL_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-dual-patcher.pid"
@@ -157,6 +168,10 @@ while true; do
             rm -f "$MANUAL_PATCHER_PID_FILE"
         fi
     else
+        if [[ -f "$PENDING_SIGNAL" ]]; then
+            echo "🚨 Signal detected again."
+            mv "$PENDING_SIGNAL" "$DETECTOR_SIGNAL"
+        fi
         echo "🕵️ Still waiting... ($DETECTOR_SIGNAL not found)"
         sleep 5
     fi

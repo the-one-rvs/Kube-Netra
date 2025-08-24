@@ -50,6 +50,7 @@ echo "------------------------------------------"
 
 count=0
 DETECTOR_SIGNAL="\$KUBENETRA_DIR/detector/${WATCHER_NAME}-new-tag"
+PENDING_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-pending-tag"
 
 
 while true; do
@@ -77,7 +78,11 @@ while true; do
     if [ -n "\$NEW_TAGS" ]; then
       echo "🎉 New Tags Detected:"
       if [[ "\$count" -gt 2 ]]; then
-        touch "\$DETECTOR_SIGNAL"
+        if [ -f "\$DETECTOR_SIGNAL" ]; then
+            touch "\$PENDING_SIGNAL"
+        else
+          touch "\$DETECTOR_SIGNAL"
+        fi
       fi
       echo "\$NEW_TAGS"
       # Save the latest tag
