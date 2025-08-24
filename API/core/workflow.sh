@@ -104,10 +104,10 @@ PENDING_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-pending-tag"
 echo "📡 Finding new tags. "
 
 while true; do
-    if [[ -f "$PENDING_SIGNAL" ]]; then
-        echo "🚨 Signal detected again."
-        mv "$PENDING_SIGNAL" "$DETECTOR_SIGNAL"
-    fi
+    # if [[ -f "$PENDING_SIGNAL" ]]; then
+    #     echo "🚨 Signal detected again."
+    #     mv "$PENDING_SIGNAL" "$DETECTOR_SIGNAL"
+    # fi
     if [[ -f "$DETECTOR_SIGNAL" ]]; then
         echo "🚨 Signal detected. Proceeding with patchers..."
         # rm -f "$PENDING_SIGNAL"
@@ -118,9 +118,9 @@ while true; do
             env_name=$(basename "$runner_file" | sed -E "s/-${PROJ_NAME}-runner\.sh//")
 
             if [[ $mode == "manual" ]]; then
-                log_file="$SCRIPT_DIR/logs/${env_name}-${PROJ_NAME}-manual-patcher.log"
-                while [[ ! -f "$log_file" ]]; do
-                    echo "🕐 Waiting for manual patcher to start: $log_file"
+                pid_file="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-manual-patcher.pid"
+                while [[ ! -f "$pid_file" ]]; do
+                    echo "🕐 Waiting for manual patcher to start: $pid_file"
                     sleep 2
                 done
             elif [[ $mode == "auto" ]]; then
@@ -133,16 +133,11 @@ while true; do
             fi
         done
 
-        sleep 30
+        sleep 10
         rm -f "$DETECTOR_SIGNAL"
         echo "📤 Signal processed and removed."
 
-        if [[ -f "$PENDING_SIGNAL" ]]; then
-            echo "🚨 Signal detected again."
-            mv "$PENDING_SIGNAL" "$DETECTOR_SIGNAL"
-        fi
         
-
         AUTO_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-auto-patcher.pid"
         DUAL_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-dual-patcher.pid"
         MANUAL_PATCHER_PID_FILE="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-manual-patcher.pid"
@@ -169,12 +164,13 @@ while true; do
         fi
     else
         if [[ -f "$PENDING_SIGNAL" ]]; then
-            echo "🚨 Signal detected again."
+            echo "🚨 Pending Signal Forwarding."
             mv "$PENDING_SIGNAL" "$DETECTOR_SIGNAL"
         fi
         echo "🕵️ Still waiting... ($DETECTOR_SIGNAL not found)"
         sleep 5
     fi
+
 done
 ) > "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log" 2>&1 & disown
 WORKFLOW_PID=$!

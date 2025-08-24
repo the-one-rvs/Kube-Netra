@@ -79,6 +79,10 @@ if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
   git  push origin "$BRANCH"
 
   echo "✅ Changes pushed to $BRANCH."
+
+  sleep 20
+  cd ..
+  rm -rf "$TMP_DIR"
 else
   echo "ℹ️ No new tag. Current tag is still: $CURRENT_TAG."
 fi

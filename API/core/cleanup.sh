@@ -27,10 +27,15 @@ if [ -d "$SCRIPT_DIR/pid/$PROJ_NAME" ]; then
 fi
 
 # Remove logs
+DETECTOR_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-new-tag"
+PENDING_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-pending-tag"
+
 rm -rf "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log"
 rm -rf "$SCRIPT_DIR/logs/$PROJ_NAME/$WATCHER_NAME-watch.sh.log"
 rm -rf "$SCRIPT_DIR/env/$PROJ_NAME"
 rm -rf "$SCRIPT_DIR/runners/$PROJ_NAME"
+rm -rf "$DETECTOR_SIGNAL"
+rm -rf "$PENDING_SIGNAL"
 
 count=1
 ENV_COUNT=$(echo "$ENV_DETAILS" | jq '.environments | length')

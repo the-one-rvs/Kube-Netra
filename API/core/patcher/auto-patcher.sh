@@ -91,6 +91,7 @@ while true; do
 
     echo "✅ Changes pushed to $BRANCH."
 
+    sleep 20
     cd ..
     rm -rf "$TMP_DIR"
   else

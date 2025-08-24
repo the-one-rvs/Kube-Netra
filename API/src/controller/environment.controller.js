@@ -144,7 +144,7 @@ const updateEnvironment = asyncHandler(async(req, res) => {
         branch
        } = req.body
 
-       const {environmentId} = req.params
+       const { environmentId } = req.params
 
        const updateFields = {};
        if (environmentName) updateFields.environmentName = environmentName;

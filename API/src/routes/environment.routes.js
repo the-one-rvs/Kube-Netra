@@ -24,7 +24,7 @@ router
 .get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_view_environment"), getEnvironment)
 
 router
-.route("/updateEnvironment")
+.route("/updateEnvironment/:environmentId")
 .patch(verifyJWT, verifyProject, requireAnyPermission("admin", "access_update_environment", "access_full_project", "access_full_environment"), updateEnvironment)
 
 router

@@ -75,6 +75,7 @@ EOF
 #!/bin/bash
 # Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
+echo "Running Auto Patcher for ${ENV_NAME}-${PROJ_NAME}"
 nohup "$SCRIPT_DIR/patcher/auto-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-auto-patcher.log" 2>&1 &
 AUTO_PATCHER_PID=\$!
@@ -93,6 +94,7 @@ EOF
 #!/bin/bash
 # Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
+echo "Running Manual Patcher for ${ENV_NAME}-${PROJ_NAME}"
 nohup "$SCRIPT_DIR/patcher/manual-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-manual-patcher.log" 2>&1 &
 MANUAL_PATCHER_PID=\$!
