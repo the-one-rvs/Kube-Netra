@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import yaml from "yamljs";
 import swaggerUi from "swagger-ui-express";
+import errorHandler from './middleware/errorHandler.js'
+import { ApiError } from './utils/ApiError.js';
 
 
 const app = express()
@@ -44,5 +46,13 @@ app.use("/api/v1/pat", patRouter)
 
 import callCoreRouter from './routes/callCore.routes.js'
 app.use("/api/v1/callCore", callCoreRouter)
+
+
+// app.use((req, res, next) => {
+//     next(new ApiError(404, `Cannot find ${req.originalUrl} on this server`));
+// });
+
+
+app.use(errorHandler);
 
 export { app }

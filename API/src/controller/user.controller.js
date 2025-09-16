@@ -21,11 +21,13 @@ const createRootAdmin = asyncHandler(async(req, res) => {
         if (!passValidator(password)) {
             throw new ApiError(400, "Invalid password")
         }
+        
 
         const exsistingAdmin = await User.findOne({ email })
         if (exsistingAdmin) {
             throw new ApiError(400, "User already exists")
         }
+
         const user = await User.create(
             {
                 username: username, 
@@ -35,18 +37,23 @@ const createRootAdmin = asyncHandler(async(req, res) => {
                 permissions: ["admin"] 
             }
         )
+        
+        if (!user) {
+            throw new ApiError(400, "User not found")
+        }
+        
         const createdAdmin = await User.findById(user._id).select("-password -refreshToken")
+        
         if (!createdAdmin) {
             throw new ApiError(400, "User not found")
         }
-
         return res.status(200).json(new ApiResponse(
             200,
             createdAdmin,
             "Admin registered successfully"
         ))
     } catch (error) {
-        
+        throw new ApiError(400, error?.message)
     }
 })
 

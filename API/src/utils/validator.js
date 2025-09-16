@@ -2,10 +2,10 @@ import { ApiError } from "./ApiError.js"
 
 export const emailValidator = (email) => {
     if (!email.includes("@")) {
-        throw new ApiError("Email Should have @ symbol")
+        throw new ApiError(400, "Email Should have @ symbol")
     }
-    if (!email.includes(".com")) {
-        throw new ApiError("Email Should have .com")
+    if (!email.includes(".")) {
+        throw new ApiError(400, "Email Should have .")
     }
     return true
 }
