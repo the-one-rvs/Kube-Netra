@@ -316,6 +316,10 @@ const updateUser = asyncHandler(async(req, res) => {
             throw new ApiError(404, "All fields are required")
         }
 
+        if (!emailValidator(email)) {
+            throw new ApiError(400, "Invalid email")
+        }
+
         const user = await User.findByIdAndUpdate(
             req.user?._id,
             {
@@ -344,6 +348,10 @@ const changePassword = asyncHandler(async(req, res) => {
 
         const user = await User.findById(req.user?._id)
         const isPassCorrect = await user.isPasswordCorrect(oldPassword)
+
+        if (!passValidator(newPassword)) {
+            throw new ApiError(400, "Invalid password")
+        }
 
         if (!isPassCorrect){
             throw new ApiError(400, "Invalid Password")

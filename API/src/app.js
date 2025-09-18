@@ -47,6 +47,9 @@ app.use("/api/v1/pat", patRouter)
 import callCoreRouter from './routes/callCore.routes.js'
 app.use("/api/v1/callCore", callCoreRouter)
 
+import mailRouter from './routes/mail.routes.js'
+app.use("/api/v1/mail", mailRouter)
+
 
 // app.use((req, res, next) => {
 //     next(new ApiError(404, `Cannot find ${req.originalUrl} on this server`));

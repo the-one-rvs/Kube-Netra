@@ -31,7 +31,7 @@ const RegisterAdmin = () => {
   
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/home");
     } else if (error) {
       navigate("/error");
     }

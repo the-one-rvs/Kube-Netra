@@ -1,11 +1,11 @@
-// src/pages/Auth/RegisterAdmin.jsx
+// src/pages/Auth/Login.jsx
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";   
-import { registerAdmin } from "../../features/auth/authSlice";
+import { loginUser } from "../../features/auth/authSlice";
 
-const RegisterAdmin = () => {
+const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();  
 
@@ -14,8 +14,6 @@ const RegisterAdmin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
-    username: "",
-    fullname: "",
     password: "",
   });
 
@@ -25,14 +23,14 @@ const RegisterAdmin = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(registerAdmin(form));
+    dispatch(loginUser(form));
   };
 
-  
   useEffect(() => {
     if (user) {
-      navigate("/");
-    } else if (error) {
+      navigate("/home");
+    }
+    else if (error) {
       navigate("/error");
     }
   }, [user, error, navigate]);
@@ -50,19 +48,11 @@ const RegisterAdmin = () => {
 
         {/* Right */}
         <div className="flex flex-col justify-center p-10">
-          <h2 className="text-2xl font-bold text-gray-900">Welcome to KubeNetra</h2>
-          <p className="text-gray-600 text-sm mb-6">Register for Admin !!</p>
+          <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
+          <p className="text-gray-600 text-sm mb-6">Login to continue</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input type="email" name="email" placeholder="Email" value={form.email}
-              onChange={handleChange} required
-              className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500" />
-
-            <input type="text" name="username" placeholder="Username" value={form.username}
-              onChange={handleChange} required
-              className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500" />
-
-            <input type="text" name="fullname" placeholder="Full Name" value={form.fullname}
               onChange={handleChange} required
               className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500" />
 
@@ -78,11 +68,11 @@ const RegisterAdmin = () => {
             </div>
 
             {error && <p className="text-red-600 text-sm">{error}</p>}
-            {user && <p className="text-green-600 text-sm">Admin registered successfully!</p>}
+            {user && <p className="text-green-600 text-sm">Login successful!</p>}
 
             <button type="submit" disabled={loading}
               className="w-full bg-blue-600 text-white p-3 rounded-full font-medium hover:bg-blue-700 transition disabled:opacity-50">
-              {loading ? "Creating..." : "Create an account"}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
         </div>
@@ -91,4 +81,4 @@ const RegisterAdmin = () => {
   );
 };
 
-export default RegisterAdmin;
+export default Login;
