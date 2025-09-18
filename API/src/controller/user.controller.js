@@ -385,6 +385,32 @@ const getAllUser = asyncHandler(async(req, res) => {
     }
 })
 
+const checkAdminExsists = asyncHandler(async(req, res) => {
+    try {
+        const admin = await User.findOne({permissions: "admin"})
+        if (admin){
+            return res.status(200).json(new ApiResponse(200, {}, "Admin found successfully"))
+        }
+        if (!admin){
+            return res.status(200).json(new ApiResponse(200, {}, "Admin not found"))
+        }
+        } catch (error) {
+        throw new ApiError(400, error?.message)
+    }
+})
+
+const validateToken = asyncHandler(async(req, res) => {
+    try {
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
+        if (!token) {
+            return res.status(200).json(new ApiResponse(200, {}, "Token not found"))
+        }
+        return res.status(200).json(new ApiResponse(200, {}, "Token found successfully"))
+    } catch (error) {
+        throw new ApiError(400, error?.message)
+    }
+})
+
 
 export {
     createRootAdmin, 
@@ -396,5 +422,7 @@ export {
     getMe,
     updateUser,
     changePassword,
-    getAllUser
+    getAllUser,
+    checkAdminExsists,
+    validateToken
 }

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { 
     changePassword,
+    checkAdminExsists,
     createRootAdmin,
     deleteUser,
     getAllUser,
@@ -9,7 +10,8 @@ import {
     logoutUser, 
     reclaimTokens, 
     registerUser,
-    updateUser
+    updateUser,
+    validateToken
  } from "../controller/user.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { 
@@ -33,5 +35,7 @@ router.route("/deleteUser").delete(verifyJWT,requireAnyPermission("admin", "acce
 router.route("/getPermission").get(showPermissions)
 router.route("/addPermission").post(verifyJWT, requireAnyPermission("admin", "access_modify_permissions"), addUserPermission)
 router.route("/removePermission").post(verifyJWT, requireAnyPermission("admin", "access_modify_permissions"), removePermissions)
+router.route("/checkAdminExsists").get(checkAdminExsists)
+router.route("/validateToken").get(validateToken)
 
 export default router
