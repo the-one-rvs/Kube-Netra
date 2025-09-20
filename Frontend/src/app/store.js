@@ -4,6 +4,7 @@ import queryReducer from "../features/query/querySlice"
 import currentUserReducer from "../features/user/currentUserSlice"
 import editProfileReducer from "../features/user/editProfileSlice"
 import changePasswordReducer from "../features/user/changePasswordSlice";
+import projectReducer from "../features/projects/projectSlice"
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     query: queryReducer,
     currentUser: currentUserReducer,
     editProfile: editProfileReducer,
-    changePassword: changePasswordReducer
+    changePassword: changePasswordReducer,
+    projects: projectReducer
   },
 });

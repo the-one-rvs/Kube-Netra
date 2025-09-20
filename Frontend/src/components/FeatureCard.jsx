@@ -1,4 +1,4 @@
-const FeatureCard = ({ emoji, title, description, buttonText, onClick }) => {
+const FeatureCard = ({ emoji, title, description, buttonText, onClick, btncolor, hovercolor }) => {
   return (
     <div className="rounded-2xl shadow-md hover:shadow-lg transition bg-white p-6 flex flex-col items-center text-center">
       
@@ -9,7 +9,7 @@ const FeatureCard = ({ emoji, title, description, buttonText, onClick }) => {
 
       <button
         onClick={onClick}
-        className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition"
+        className={`${btncolor} ${hovercolor} text-white px-4 py-2 rounded-full transition`}
       >
         {buttonText}
       </button>

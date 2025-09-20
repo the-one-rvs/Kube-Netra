@@ -64,6 +64,10 @@ const projectSchema = new Schema({
     isWorkflowTriggered: {
         type: Boolean,
         default: false
+    },
+    isfaviorate: {
+        type: Boolean,
+        default: false
     }
 
 }, {

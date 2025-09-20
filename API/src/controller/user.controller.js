@@ -402,8 +402,20 @@ const checkAdminExsists = asyncHandler(async(req, res) => {
 const validateToken = asyncHandler(async(req, res) => {
     try {
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
+        const refreshToken = req.cookies?.refreshToken
+        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+        const user = await User.findById(decodedToken?._id).select("-password")
+
+        if (!user) {
+            return res.status(200).json(new ApiResponse(200, {}, "User not found"))
+        }
+
+        if (user.refreshToken !== refreshToken) {
+            throw new ApiError(400, "Invalid refresh token")
+        }
         if (!token) {
-            return res.status(200).json(new ApiResponse(200, {}, "Token not found"))
+            return res.status(200).json(new ApiResponse(200, {}, "Refresh Token not found"))
         }
         return res.status(200).json(new ApiResponse(200, {}, "Token found successfully"))
     } catch (error) {

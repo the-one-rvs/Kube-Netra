@@ -1,25 +1,29 @@
-// src/features/currentUser/currentUserSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// REFRESH TOKENS
+// 🔹 REFRESH TOKENS (GET instead of POST)
 export const refreshTokens = createAsyncThunk(
   "currentUser/refreshTokens",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.post("/api/v1/users/reclaimTokens", {}, { withCredentials: true });
+      const res = await axios.get("/api/v1/users/reclaimTokens", {
+        withCredentials: true, // ✅ cookies include
+      });
+
       if (res.status >= 200 && res.status < 300) {
         return res.data; // { accessToken, refreshToken }
       } else {
         return rejectWithValue(res.data?.message || "Failed to refresh tokens");
       }
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Token refresh failed");
+      return rejectWithValue(
+        err.response?.data?.message || "Token refresh failed"
+      );
     }
   }
 );
 
-// GET CURRENT USER (with retry on token refresh)
+// 🔹 GET CURRENT USER (retry after refresh if expired)
 export const fetchCurrentUser = createAsyncThunk(
   "currentUser/fetchCurrentUser",
   async (_, { rejectWithValue, dispatch }) => {
@@ -88,13 +92,12 @@ const currentUserSlice = createSlice({
       })
 
       // REFRESH TOKENS
-      .addCase(refreshTokens.fulfilled, (state, action) => {
-        // optional: you can save tokens in state if needed
-        state.error = null;
+      .addCase(refreshTokens.fulfilled, (state) => {
+        state.error = null; // ✅ refresh successful
       })
       .addCase(refreshTokens.rejected, (state, action) => {
         state.error = action.payload;
-        state.user = null;
+        state.user = null; // session expired
       });
   },
 });

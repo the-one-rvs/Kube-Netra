@@ -107,7 +107,7 @@ const enterProject = asyncHandler(async(req, res) => {
 const exitProject = asyncHandler(async(req, res) => {
     try {
 
-        if (!req.user && !req.project) {
+        if (!req.user) {
             throw new ApiError(400, "Unauthorized request")
         }
 
@@ -236,6 +236,35 @@ const getAllProjects = asyncHandler(async(req, res) => {
     }
 })
 
+const doAlterFavorite = asyncHandler(async(req, res) => {
+    try {
+        const user = req.user
+        const {projectId} = req.body
+
+        if (!user) {
+            throw new ApiError(400, "Unauthorized request")
+        }
+
+        if (!projectId) {
+            throw new ApiError(400, "Project ID not found")
+        }
+
+        const project = await Project.findById(projectId)
+        if (!project) {
+            throw new ApiError(400, "Project not found")
+        }
+
+        project.isfaviorate = !project.isfaviorate
+        await project.save()
+
+        return res.status(200).json(new ApiResponse(200, project, "Project faviorate altered successfully"))
+
+    } catch (error) {
+        throw new ApiError(400, error?.message)
+    }
+})
+
+
 export {
     createProject,
     enterProject,
@@ -243,5 +272,6 @@ export {
     updateProject,
     deleteProject,
     getCurrentProjectDetails,
-    getAllProjects
+    getAllProjects,
+    doAlterFavorite
 }
