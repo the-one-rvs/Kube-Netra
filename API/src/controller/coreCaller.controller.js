@@ -111,9 +111,9 @@ const streamWorkflowLogs = asyncHandler(async (req, res) => {
   }
 
   const workflow_logs_file = path.join(__dirname, `../../core/logs/${req.project.name}-workflow.log`);
-  if (!fs.existsSync(workflow_logs_file)) {
-    throw new ApiError(400, "Workflow logs file not found");
-  }
+  // if (!fs.existsSync(workflow_logs_file)) {
+  //   throw new ApiError(400, "Workflow logs file not found");
+  // }
 
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");

@@ -111,6 +111,22 @@ export const fetchCurrentProject = createAsyncThunk(
   }
 );
 
+export const fetchCurrentProjectDetails = createAsyncThunk(
+  "projectPage/fetchCurrent",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get("/api/v1/project/getCurrentProjectDetails");
+      if (res.data.success) {
+        return res.data.data;
+      } else {
+        return rejectWithValue("No current project found");
+      }
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch");
+    }
+  }
+);
+
 const projectSlice = createSlice({
   name: "projects",
   initialState: {
@@ -182,6 +198,9 @@ const projectSlice = createSlice({
       })
       .addCase(fetchCurrentProject.rejected, (state) => {
         state.currentProject = null;
+      })
+      .addCase(fetchCurrentProjectDetails.fulfilled, (state, action) => {
+        state.isWorkflowRunning = action.payload.isWorkflowTriggered; // 🔑 sync
       });
 
   },

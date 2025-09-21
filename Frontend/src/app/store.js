@@ -1,10 +1,13 @@
-import { configureStore, current } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
-import queryReducer from "../features/query/querySlice"
-import currentUserReducer from "../features/user/currentUserSlice"
-import editProfileReducer from "../features/user/editProfileSlice"
+import queryReducer from "../features/query/querySlice";
+import currentUserReducer from "../features/user/currentUserSlice";
+import editProfileReducer from "../features/user/editProfileSlice";
 import changePasswordReducer from "../features/user/changePasswordSlice";
-import projectReducer from "../features/projects/projectSlice"
+import projectReducer from "../features/projects/projectSlice";
+import projectPageReducer from "../features/projects/projectPageSlice";
+// import pageSSESliceReducer from "../features/projects/pageSSESlice";
+import environmentReducer from "../features/environments/environmentSlice"
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +16,12 @@ export const store = configureStore({
     currentUser: currentUserReducer,
     editProfile: editProfileReducer,
     changePassword: changePasswordReducer,
-    projects: projectReducer
+    projects: projectReducer,
+    projectPage: projectPageReducer,
+    environments: environmentReducer
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false, // ✅ EventSource objects allowed
+    }),
 });

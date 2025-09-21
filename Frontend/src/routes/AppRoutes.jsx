@@ -9,6 +9,8 @@ import ChangePassword from "../pages/User/ChangePassword";
 import Landing from "../pages/Home/Landing";
 import Projects from "../pages/Project/ProjectHome";
 import CreateProject from "../pages/Project/CreateProject";
+import ProjectPage from "../pages/Project/ProjectPage";
+import CreateEnvironment from "../pages/Environment/CreateEnvironment";
 
 const AppRoutes = () => {
   return (
@@ -23,6 +25,8 @@ const AppRoutes = () => {
         <Route path="/changePassword" element={<ChangePassword />}></Route>
         <Route path="/projects" element={<Projects />}></Route>
         <Route path="projects/createProject" element={<CreateProject />}></Route>
+        <Route path="/projects/:projectId" element={<ProjectPage />} />
+        <Route path="/projects/environment/addEnvironment" element={<CreateEnvironment />}></Route>
       </Routes>
     </Router>
   );
