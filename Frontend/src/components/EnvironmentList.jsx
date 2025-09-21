@@ -1,14 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { startManualPatcher } from "../features/projects/projectPageSlice"; // ✅ correct path
+import { startManualPatcher } from "../features/projects/projectPageSlice";
+import { MoreVertical } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
 
 const colors = [
-  "bg-red-200",
-  "bg-green-200",
-  "bg-blue-200",
-  "bg-yellow-200",
-  "bg-purple-200",
-  "bg-pink-200",
+  "bg-red-100",
+  "bg-green-100",
+  "bg-blue-100",
+  "bg-yellow-100",
+  "bg-purple-100",
+  "bg-pink-100",
 ];
 
 const EnvironmentList = ({ environments = [] }) => {
@@ -26,74 +29,150 @@ const EnvironmentList = ({ environments = [] }) => {
         <h2 className="text-2xl font-bold">Environments</h2>
         <button
           onClick={() => navigate("/projects/environment/addEnvironment")}
-          className="text-white bg-red-600 rounded-full p-2 hover:bg-red-700 transition"
+          className="text-white bg-white-600 rounded-full p-2 hover:bg-red-300 transition"
           title="Add Environment"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
+          ➕
         </button>
       </div>
 
-      {/* Environment cards */}
-      <div className="w-full max-w-3xl space-y-6">
+      {/* Vertical scrollable list */}
+      <div className="w-full max-w-3xl max-h-[70vh] overflow-y-auto space-y-6 pr-2">
         {environments.map((env, idx) => (
-          <div
+          <EnvironmentCard
             key={env._id}
-            className={`p-6 rounded-xl shadow-lg ${colors[idx % colors.length]} flex justify-between items-center`}
-          >
-            {/* Left: details */}
-            <div>
-              <h3 className="text-xl font-semibold">{env.environmentName}</h3>
-              <p className="text-sm text-gray-700">Branch: {env.branch}</p>
-              <p className="text-sm text-gray-700">Mode: {env.mode}</p>
-              <p className="text-sm text-gray-700">
-                Repo:{" "}
-                <a
-                  href={env.gitRepo}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline text-blue-700"
-                >
-                  View
-                </a>
-              </p>
-            </div>
+            env={env}
+            color={colors[idx % colors.length]}
+            dispatch={dispatch}
+            navigate={navigate}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
-            {/* Right: actions */}
-            <div className="flex items-center gap-3">
+const EnvironmentCard = ({ env, color, dispatch, navigate }) => {
+  const [open, setOpen] = useState(false);
+  const [tag, setTag] = useState(null);
+  const [polling, setPolling] = useState(true);
+  const dropdownRef = useRef(null);
+
+  // Polling for current image tag
+  useEffect(() => {
+    if (!polling) return;
+
+    const fetchTag = async () => {
+      try {
+        const res = await axios.get(
+          `/api/v1/callCore/getImageTagForEnvironment/${env._id}`,
+          { withCredentials: true }
+        );
+        const json = res.data;
+        if (json.success && json.data?.imageTag) setTag(json.data.imageTag);
+        if (json.data?.workflowStatus === "stopped") setPolling(false);
+      } catch (err) {
+        console.error("Polling failed:", err);
+      }
+    };
+
+    fetchTag();
+    const interval = setInterval(fetchTag, 5000);
+    return () => clearInterval(interval);
+  }, [polling, env._id]);
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleManualPatcher = () => {
+    dispatch(startManualPatcher(env._id));
+    setPolling(true);
+  };
+
+  return (
+    <div
+      className={`p-6 rounded-2xl shadow-xl ${color} flex flex-col relative transition hover:scale-[1.01]`}
+    >
+      {/* Top-right corner: tag + patcher + dropdown */}
+      <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+        {/* Tag box */}
+        <div className="bg-white text-black px-2 py-1 rounded-md border shadow-sm min-w-[90px] text-center">
+          {polling && !tag ? (
+            <span className="text-gray-500 animate-pulse">⏳ Fetching...</span>
+          ) : tag ? (
+            <>
+              <span className="font-semibold">Tag:</span>{" "}
+              <span className="text-green-600 font-mono">{tag}</span>
+            </>
+          ) : (
+            <span className="text-gray-400">No tag</span>
+          )}
+        </div>
+
+        {/* Manual Patcher button */}
+        {env.mode === "manual" && (
+          <button
+            onClick={handleManualPatcher}
+            className="mt-2 px-3 py-1 bg-green-100 text-green-800 rounded-md text-sm font-medium hover:bg-green-200"
+          >
+            ⚡ Manual Patcher
+          </button>
+        )}
+
+        {/* 3-dot dropdown */}
+        <div ref={dropdownRef} className="relative">
+          <button
+            onClick={() => setOpen(!open)}
+            className="p-2 rounded-full hover:bg-gray-200 mt-2"
+          >
+            <MoreVertical size={20} />
+          </button>
+
+          {open && (
+            <div className="absolute right-0 -top-24 w-44 bg-white shadow-md rounded-md z-50">
               <button
                 onClick={() => navigate(`/projects/environment/update/${env._id}`)}
-                className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-blue-100"
               >
-                Update
+                ✏️ Update
               </button>
-
               <button
                 onClick={() => navigate(`/projects/environment/delete/${env._id}`)}
-                className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-red-100"
               >
-                Delete
+                🗑️ Delete
               </button>
-
-              {env.mode === "manual" && (
-                <button
-                  onClick={() => dispatch(startManualPatcher(env._id))}
-                  className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  Manual Patcher
-                </button>
-              )}
             </div>
-          </div>
-        ))}
+          )}
+        </div>
+      </div>
+
+      {/* Card details */}
+      <div className="mb-3">
+        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+          {env.environmentName}
+        </h3>
+        <p className="text-sm text-gray-700">🌿 Branch: {env.branch}</p>
+        <p className="text-sm text-gray-700">⚙️ Mode: {env.mode}</p>
+        <p className="text-sm text-gray-700">
+          📂 Repo:{" "}
+          <a
+            href={env.gitRepo}
+            target="_blank"
+            rel="noreferrer"
+            className="underline text-blue-700"
+          >
+            View
+          </a>
+        </p>
       </div>
     </div>
   );

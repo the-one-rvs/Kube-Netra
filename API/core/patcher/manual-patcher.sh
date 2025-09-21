@@ -80,7 +80,7 @@ if [ "$NEW_TAG" != "$CURRENT_TAG" ]; then
 
   echo "✅ Changes pushed to $BRANCH."
 
-  sleep 20
+  sleep 100
   cd ..
   rm -rf "$TMP_DIR"
 else

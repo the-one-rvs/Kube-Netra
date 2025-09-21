@@ -2,6 +2,8 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Trash2, Edit3, LogOut } from "lucide-react";
+import ProfileMenu from "./ProfileMenu";
+
 
 const ProjectPageNavbar = () => {
   const navigate = useNavigate();
@@ -50,6 +52,7 @@ const ProjectPageNavbar = () => {
         >
           <LogOut size={16} /> Exit
         </button>
+        <ProfileMenu />
       </div>
     </nav>
   );

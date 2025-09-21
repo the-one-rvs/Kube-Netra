@@ -399,6 +399,69 @@ const startManualPatcher = asyncHandler(async(req, res) => {
   }
 })
 
+// ...existing code...
+const getImageTagForEnvironment = asyncHandler(async(req, res) => {
+  try {
+    const { envId } = req.params;
+    if (!req.user){
+      throw new ApiError(404, "Unauthorized request");
+    }
+    if (!req.project) {
+      throw new ApiError(404, "Project not found");
+    }
+    const env = await Environment.findById(envId);
+    if (!env) {
+      throw new ApiError(404, "Environment not found");
+    }
+
+    const githubPAT = await GithubPAT.findOne({nameOfPAT: req.project.nameOfGithubPAT}).lean();
+    if (!githubPAT) {
+      throw new ApiError(404, "GitHub PAT not found");
+    }
+
+    // Parse repo info
+    const repoUrl = env.gitRepo;
+    const helmValuePath = env.helmValuePath;
+    const branch = env.branch || "main";
+
+    // Extract owner and repo name from URL
+    const match = repoUrl.match(/github\.com[:/](.+?)\/(.+?)(\.git)?$/);
+    if (!match) {
+      throw new ApiError(400, "Invalid GitHub repo URL");
+    }
+    const owner = match[1];
+    const repo = match[2];
+
+    // Build GitHub API URL for the file
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${helmValuePath}?ref=${branch}`;
+
+    // Fetch file from GitHub
+    const response = await fetch(apiUrl, {
+      headers: {
+        "Authorization": `token ${githubPAT.githubPAT}`,
+        "Accept": "application/vnd.github.v3.raw"
+      }
+    });
+
+    if (!response.ok) {
+      throw new ApiError(response.status, "Failed to fetch Helm values file from GitHub");
+    }
+
+    const fileContent = await response.text();
+
+    // Extract image tag (assuming YAML: tag: <value>)
+    const tagMatch = fileContent.match(/tag:\s*([^\s]+)/);
+    if (!tagMatch) {
+      throw new ApiError(404, "Tag not found in Helm values file");
+    }
+    const imageTag = tagMatch[1];
+
+    return res.status(200).json(new ApiResponse(200, { imageTag }, "Image tag fetched successfully"));
+  } catch (error) {
+    throw new ApiError(400, error?.message);
+  }
+});
+
 export{
     callWorkflow,
     streamWorkflowLogs,
@@ -406,5 +469,6 @@ export{
     streamPatcherLogs,
     stopWorkflow,
     enableLogCleaner,
-    startManualPatcher
+    startManualPatcher,
+    getImageTagForEnvironment
 }

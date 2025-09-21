@@ -2,7 +2,8 @@ import { Router } from "express";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { verifyProject } from "../middleware/project.middleware.js";
 import { requireAnyPermission } from "../middleware/requirePermissions.middleware.js";
-import { callWorkflow, enableLogCleaner, startManualPatcher, stopWorkflow, streamPatcherLogs, streamWatcherLogs, streamWorkflowLogs } from "../controller/coreCaller.controller.js";
+import { callWorkflow, enableLogCleaner, getImageTagForEnvironment, startManualPatcher, stopWorkflow, streamPatcherLogs, streamWatcherLogs, streamWorkflowLogs } from "../controller/coreCaller.controller.js";
+
 
 
 const router = Router();
@@ -27,5 +28,8 @@ router.route("/logsCleaner")
 
 router.route("/startManualPatcher/:environmentId")
 .get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), startManualPatcher);
+
+router.route("/getImageTagForEnvironment/:envId")
+.get(verifyJWT, verifyProject, requireAnyPermission("admin"), getImageTagForEnvironment);
 
 export default router;
