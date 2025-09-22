@@ -1,8 +1,9 @@
+// src/components/EnvironmentList.jsx
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { startManualPatcher } from "../features/projects/projectPageSlice";
-import { MoreVertical } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { deleteEnvironment } from "../features/environments/environmentSlice";  // ✅ import
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const colors = [
@@ -14,9 +15,11 @@ const colors = [
   "bg-pink-100",
 ];
 
-const EnvironmentList = ({ environments = [] }) => {
+const EnvironmentList = ({ environments = [], onDeleteSuccess }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, success, error } = useSelector((state) => state.environments); // ✅ read state
+  
 
   if (!environments || environments.length === 0) {
     return <p className="text-gray-500 text-center">No environments found.</p>;
@@ -29,10 +32,10 @@ const EnvironmentList = ({ environments = [] }) => {
         <h2 className="text-2xl font-bold">Environments</h2>
         <button
           onClick={() => navigate("/projects/environment/addEnvironment")}
-          className="text-white bg-white-600 rounded-full p-2 hover:bg-red-300 transition"
+          className="text-white bg-red-400 rounded-full px-4 py-2 hover:bg-red-700 transition"
           title="Add Environment"
         >
-          ➕
+          ➕ Add
         </button>
       </div>
 
@@ -45,18 +48,23 @@ const EnvironmentList = ({ environments = [] }) => {
             color={colors[idx % colors.length]}
             dispatch={dispatch}
             navigate={navigate}
+            loading={loading}
+            onDeleteSuccess={onDeleteSuccess}
           />
         ))}
       </div>
+
+      {/* Feedback */}
+      {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
+      {success && <p className="text-green-600 text-sm mt-4">Environment deleted! Please reload</p>}
     </div>
   );
 };
 
-const EnvironmentCard = ({ env, color, dispatch, navigate }) => {
-  const [open, setOpen] = useState(false);
+const EnvironmentCard = ({ env, color, dispatch, navigate, loading, onDeleteSuccess }) => {
   const [tag, setTag] = useState(null);
   const [polling, setPolling] = useState(true);
-  const dropdownRef = useRef(null);
+  
 
   // Polling for current image tag
   useEffect(() => {
@@ -81,29 +89,26 @@ const EnvironmentCard = ({ env, color, dispatch, navigate }) => {
     return () => clearInterval(interval);
   }, [polling, env._id]);
 
-  // Close dropdown if clicked outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const handleManualPatcher = () => {
     dispatch(startManualPatcher(env._id));
     setPolling(true);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this environment?")) {
+      const res = await dispatch(deleteEnvironment(env._id));
+      if (res.meta.requestStatus === "fulfilled" && onDeleteSuccess) {
+        onDeleteSuccess(env._id); // ✅ remove from list in parent
+      }
+    }
   };
 
   return (
     <div
       className={`p-6 rounded-2xl shadow-xl ${color} flex flex-col relative transition hover:scale-[1.01]`}
     >
-      {/* Top-right corner: tag + patcher + dropdown */}
-      <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
-        {/* Tag box */}
+      {/* Top-right: tag box */}
+      <div className="absolute top-4 right-4">
         <div className="bg-white text-black px-2 py-1 rounded-md border shadow-sm min-w-[90px] text-center">
           {polling && !tag ? (
             <span className="text-gray-500 animate-pulse">⏳ Fetching...</span>
@@ -114,43 +119,6 @@ const EnvironmentCard = ({ env, color, dispatch, navigate }) => {
             </>
           ) : (
             <span className="text-gray-400">No tag</span>
-          )}
-        </div>
-
-        {/* Manual Patcher button */}
-        {env.mode === "manual" && (
-          <button
-            onClick={handleManualPatcher}
-            className="mt-2 px-3 py-1 bg-green-100 text-green-800 rounded-md text-sm font-medium hover:bg-green-200"
-          >
-            ⚡ Manual Patcher
-          </button>
-        )}
-
-        {/* 3-dot dropdown */}
-        <div ref={dropdownRef} className="relative">
-          <button
-            onClick={() => setOpen(!open)}
-            className="p-2 rounded-full hover:bg-gray-200 mt-2"
-          >
-            <MoreVertical size={20} />
-          </button>
-
-          {open && (
-            <div className="absolute right-0 -top-24 w-44 bg-white shadow-md rounded-md z-50">
-              <button
-                onClick={() => navigate(`/projects/environment/update/${env._id}`)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-blue-100"
-              >
-                ✏️ Update
-              </button>
-              <button
-                onClick={() => navigate(`/projects/environment/delete/${env._id}`)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-red-100"
-              >
-                🗑️ Delete
-              </button>
-            </div>
           )}
         </div>
       </div>
@@ -173,6 +141,37 @@ const EnvironmentCard = ({ env, color, dispatch, navigate }) => {
             View
           </a>
         </p>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-3 mt-4">
+        {env.mode === "manual" && (
+          <button
+            onClick={handleManualPatcher}
+            className="px-4 py-2 bg-green-700 text-white rounded-md text-sm font-medium hover:bg-green-400"
+          >
+            ⚡ Manual Patcher
+          </button>
+        )}
+
+        <button
+          onClick={() =>
+            navigate(
+              `/projects/${env.projectId}/environment/${env.environmentNumber}/edit/${env._id}`
+            )
+          }
+          className="px-4 py-2 bg-gray-700 text-white rounded-md text-sm font-medium hover:bg-gray-400"
+        >
+          ✏️ Update
+        </button>
+
+        <button
+          onClick={handleDelete}
+          disabled={loading}
+          className="px-4 py-2 bg-red-700 text-white rounded-md text-sm font-medium hover:bg-red-400 disabled:opacity-50"
+        >
+          {loading ? "Deleting..." : "🗑️ Delete"}
+        </button>
       </div>
     </div>
   );

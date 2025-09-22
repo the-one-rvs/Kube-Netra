@@ -137,8 +137,6 @@ const updateProject = asyncHandler(async(req, res) => {
             dockerImage,
             poolInterval,
             imageType,
-            githubUsername,
-            githubPAT,
             dockerhubPAT,
             dockerhubUsername
         } = req.body
@@ -148,8 +146,6 @@ const updateProject = asyncHandler(async(req, res) => {
         if (dockerImage) updateFields.dockerImage = dockerImage;
         if (poolInterval) updateFields.poolInterval = poolInterval;
         if (imageType) updateFields.imageType = imageType;
-        if (githubUsername) updateFields.githubUsername = githubUsername;
-        if (githubPAT) updateFields.githubPAT = githubPAT;
         if (imageType === "private") {
             if (dockerhubPAT) updateFields.dockerhubPAT = dockerhubPAT;
             if (dockerhubUsername) updateFields.dockerhubUsername = dockerhubUsername;
@@ -166,7 +162,7 @@ const updateProject = asyncHandler(async(req, res) => {
                 new: true , 
                 runValidators: true  
             }
-        ).select("-githubPAT -dockerhubPAT")
+        ).select("-dockerhubPAT")
 
         return res
         .status(200)

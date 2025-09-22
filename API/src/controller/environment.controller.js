@@ -112,8 +112,8 @@ const getEnvironment = asyncHandler(async(req, res) => {
             throw new ApiError(404, "Project not found")
         }
 
-        if (req.project._id !== projectId) {
-            throw new ApiError(404, "Unauthorized to perform action")
+        if (req.project._id.toString() !== projectId) {
+            throw new ApiError(404, "Unauthorized to perform action");
         }
 
         const environment = await Environment.findOne({

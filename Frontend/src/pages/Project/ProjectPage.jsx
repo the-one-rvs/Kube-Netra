@@ -69,7 +69,7 @@ const ProjectPage = () => {
 
           {!loading && !error && (
             <div className="flex flex-col items-center w-full space-y-12">
-              <EnvironmentList environments={environments} />
+              <EnvironmentList environments={environments}  />
               <LogsSection />
             </div>
           )}

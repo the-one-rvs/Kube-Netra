@@ -11,6 +11,8 @@ import Projects from "../pages/Project/ProjectHome";
 import CreateProject from "../pages/Project/CreateProject";
 import ProjectPage from "../pages/Project/ProjectPage";
 import CreateEnvironment from "../pages/Environment/CreateEnvironment";
+import UpdateEnvironment from "../pages/Environment/UpdateEnvironment";
+import UpdateProject from "../pages/Project/UpdateProject";
 
 const AppRoutes = () => {
   return (
@@ -27,6 +29,8 @@ const AppRoutes = () => {
         <Route path="projects/createProject" element={<CreateProject />}></Route>
         <Route path="/projects/:projectId" element={<ProjectPage />} />
         <Route path="/projects/environment/addEnvironment" element={<CreateEnvironment />}></Route>
+        <Route path="/projects/:projectId/environment/:environmentNumber/edit/:environmentId" element={<UpdateEnvironment />}></Route>
+        <Route path="/projects/:projectId/update" element={<UpdateProject />}></Route>
       </Routes>
     </Router>
   );

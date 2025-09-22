@@ -25,7 +25,7 @@ router
 
 router
 .route("/updateEnvironment/:environmentId")
-.patch(verifyJWT, verifyProject, requireAnyPermission("admin", "access_update_environment", "access_full_project", "access_full_environment"), updateEnvironment)
+.patch(verifyJWT, verifyProject, requireAnyPermission("admin", "access_update_environment", "access_full_project", "access_full_environment"),validateGitHubRepo, updateEnvironment)
 
 router
 .route("/getAllEnvironment")

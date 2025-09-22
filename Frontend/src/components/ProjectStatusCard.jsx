@@ -73,6 +73,22 @@ const ProjectStatusCard = () => {
       >
         {isWorkflowRunning ? "Running" : "Not Running"}
       </span>
+
+      {/* GitHub PAT Box */}
+      <span
+        className="ml-auto px-4 py-2 rounded-xl bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 text-gray-900 text-sm font-mono shadow-lg flex items-center gap-2 hover:shadow-purple-300/40 transition"
+      >
+        <span className="text-purple-600 font-semibold">GitHub PAT :</span>
+        {currentProject?.nameOfGithubPAT ? (
+          <span className="font-semibold text-gray-800">
+            {currentProject.nameOfGithubPAT}
+          </span>
+        ) : (
+          <span className="italic text-gray-400">PAT not found</span>
+        )}
+      </span>
+
+
     </div>
   );
 };

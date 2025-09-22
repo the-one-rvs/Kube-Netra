@@ -8,6 +8,7 @@ import projectReducer from "../features/projects/projectSlice";
 import projectPageReducer from "../features/projects/projectPageSlice";
 // import pageSSESliceReducer from "../features/projects/pageSSESlice";
 import environmentReducer from "../features/environments/environmentSlice"
+import projectOpReducer from "../features/projects/projectOpSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,7 +19,8 @@ export const store = configureStore({
     changePassword: changePasswordReducer,
     projects: projectReducer,
     projectPage: projectPageReducer,
-    environments: environmentReducer
+    environments: environmentReducer,
+    projectOp: projectOpReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
