@@ -76,6 +76,8 @@ EOF
 # Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
 echo "Running Auto Patcher for ${ENV_NAME}-${PROJ_NAME}"
+mkdir -p "$SCRIPT_DIR/logs/"
+touch "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-auto-patcher.log"
 nohup "$SCRIPT_DIR/patcher/auto-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-auto-patcher.log" 2>&1 &
 AUTO_PATCHER_PID=\$!
@@ -95,10 +97,13 @@ EOF
 # Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
 echo "Running Manual Patcher for ${ENV_NAME}-${PROJ_NAME}"
+mkdir -p "$SCRIPT_DIR/logs/"
+touch "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-manual-patcher.log"
 nohup "$SCRIPT_DIR/patcher/manual-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-manual-patcher.log" 2>&1 &
 MANUAL_PATCHER_PID=\$!
 echo \$MANUAL_PATCHER_PID > "$SCRIPT_DIR/pid/${PROJ_NAME}/${ENV_NAME}/$ENV_NAME-manual-patcher.pid"
+sleep 20
 EOF
     chmod +x "$RUNNER_FILE"
   fi
@@ -108,6 +113,7 @@ EOF
 #!/bin/bash
 # Runner for ${ENV_NAME}-${PROJ_NAME}
 mkdir -p $SCRIPT_DIR/logs
+
 nohup "$SCRIPT_DIR/patcher/dual-patcher.sh" "$ENV_FILE" \
     > "$SCRIPT_DIR/logs/${ENV_NAME}-${PROJ_NAME}-dual-patcher.log" 2>&1 &
 DUAL_PATCHER_PID=\$!

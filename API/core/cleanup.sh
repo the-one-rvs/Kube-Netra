@@ -30,19 +30,32 @@ fi
 DETECTOR_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-new-tag"
 PENDING_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-pending-tag"
 
-rm -rf "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log"
-rm -rf "$SCRIPT_DIR/logs/$PROJ_NAME/$WATCHER_NAME-watch.sh.log"
+rm  "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log"
+echo "Log files cleaned up.  $SCRIPT_DIR/logs/$PROJ_NAME-workflow.log" 
+rm  "$SCRIPT_DIR/logs/$PROJ_NAME/$WATCHER_NAME-watch.sh.log"
+echo "Log files cleaned up.  $SCRIPT_DIR/logs/$WATCHER_NAME-watch.sh.log"
 rm -rf "$SCRIPT_DIR/env/$PROJ_NAME"
+echo "Environment files cleaned up.  $SCRIPT_DIR/env/$PROJ_NAME"
 rm -rf "$SCRIPT_DIR/runners/$PROJ_NAME"
+echo "Runner scripts cleaned up.  $SCRIPT_DIR/runners/$PROJ_NAME"
+rm -rf "$SCRIPT_DIR/repos/$WATCHER_NAME"
+echo "Repository files cleaned up.  $SCRIPT_DIR/repos/$WATCHER_NAME"
 rm -rf "$DETECTOR_SIGNAL"
 rm -rf "$PENDING_SIGNAL"
 
-count=1
+# count=1
 ENV_COUNT=$(echo "$ENV_DETAILS" | jq '.environments | length')
-while [ $count -le $ENV_COUNT ]; do
+count=1
+while [ "$count" -le "$ENV_COUNT" ]; do
     ENV_NAME=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].environmentName")
     MODE=$(echo "$ENV_DETAILS" | jq -r ".environments[$((count-1))].mode")
+
+    echo "Cleaning logs for: $ENV_NAME ($MODE)"
     rm -rf "$SCRIPT_DIR/logs/$ENV_NAME-$PROJ_NAME-$MODE-patcher.log"
-done 
+    echo "Removed: $SCRIPT_DIR/logs/$ENV_NAME-$PROJ_NAME-$MODE-patcher.log"
+
+    count=$((count+1))
+done
+
 
 echo "✅ Cleanup complete."

@@ -29,6 +29,9 @@ mkdir -p $SCRIPT_DIR/logs
 mkdir -p $SCRIPT_DIR/pid
 mkdir -p $SCRIPT_DIR/pid/${PROJ_NAME}
 
+mkdir -p $SCRIPT_DIR/logs
+touch $SCRIPT_DIR/logs/$LOG_FILE_LOCATION.log
+
 nohup $WATCHER_FILE > $SCRIPT_DIR/logs/$LOG_FILE_LOCATION.log 2>&1 &
 WATCHER_PID=$!
 echo $WATCHER_PID > "$SCRIPT_DIR/pid/${PROJ_NAME}/${WATCHER_NAME}-watcher.pid"
@@ -98,6 +101,7 @@ for env in "${selected_envs[@]}"; do
 done
 
 echo "Starting runners sequentially..."
+touch "$SCRIPT_DIR/logs/$PROJ_NAME-workflow.log"
 (
 DETECTOR_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-new-tag"
 PENDING_SIGNAL="$SCRIPT_DIR/detector/${WATCHER_NAME}-pending-tag"
@@ -121,19 +125,20 @@ while true; do
                 pid_file="$SCRIPT_DIR/pid/${PROJ_NAME}/${env_name}/$env_name-manual-patcher.pid"
                 while [[ ! -f "$pid_file" ]]; do
                     echo "🕐 Waiting for manual patcher to start: $pid_file"
-                    sleep 2
+                    sleep 20
                 done
             elif [[ $mode == "auto" ]]; then
                 log_file="$SCRIPT_DIR/logs/${env_name}-${PROJ_NAME}-auto-patcher.log"
                 echo "▶️ Starting: $runner_file"
                 bash "$runner_file"
+                sleep 20
                 [[ $? -ne 0 ]] && echo "❌ Failed: $runner_file" && exit 1
                 echo "✅ Done: $runner_file"
                 sleep 5
             fi
         done
 
-        sleep 10
+        sleep 40
         rm -f "$DETECTOR_SIGNAL"
         echo "📤 Signal processed and removed."
 

@@ -33,8 +33,8 @@ git config --global user.name "the-one-rvs"
 git config --global user.email "vaibhavsarswat142005@gmail.com"
 
 
-PATCHER_DIR=$(dirname "$(readlink -f "$0")")
-REPOS_DIR="$PATCHER_DIR/repos"
+PATCHER_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
+REPOS_DIR="$PATCHER_DIR/repos/$DOCKER_PROJECT_NAME"
 mkdir -p "$REPOS_DIR"
 while true; do
   RAND_SUFFIX=$((RANDOM % 10000))

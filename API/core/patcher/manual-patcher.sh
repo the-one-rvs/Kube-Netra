@@ -32,8 +32,8 @@ fi
 #   GIT_REPO_URL="$GIT_REPO"
 # fi
 
-PATCHER_DIR=$(dirname "$(readlink -f "$0")")
-REPOS_DIR="$PATCHER_DIR/repos"
+PATCHER_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
+REPOS_DIR="$PATCHER_DIR/repos/$DOCKER_PROJECT_NAME"
 mkdir -p "$REPOS_DIR"
 while true; do
   RAND_SUFFIX=$((RANDOM % 10000))
