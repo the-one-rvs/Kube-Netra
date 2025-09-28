@@ -42,10 +42,10 @@ It helps you quickly spin up the full stack (API, Frontend, MongoDB) using Docke
    ```
 
 5. **Access the stack:**
-   - **Backend API:** [http://localhost:8000](http://localhost:8000)
-   - **Frontend:** [http://localhost:5173](http://localhost:5173)
-   - **Swagger Docs:** [http://localhost:8000/api-docs](http://localhost:8000/api-docs)
-   - **MongoDB:** [localhost:27017](localhost:27017)
+   - **Backend API:** [<host-ip>:8000](<host-ip>:8000)
+   - **Frontend:** [<host-ip>:5173](<host-ip>:5173)
+   - **Swagger Docs:** [<host-ip>:8000/api-docs](<host-ip>:8000/api-docs)
+   - **MongoDB:** [<host-ip>:27017](<host-ip>:27017)
 
 ---
 
