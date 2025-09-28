@@ -1,0 +1,14 @@
+.env
+node_modules
+core/watchers
+core/tags
+core/runners
+core/env
+core/logs
+core/.git-credentials
+core/patcher/repos
+core/detector
+core/install.sh
+core/kube-netra
+core/pid
+core/repos

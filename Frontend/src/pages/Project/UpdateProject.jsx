@@ -29,8 +29,7 @@ const UpdateProject = () => {
 
   // auto-fill form when details loaded
   useEffect(() => {
-    // console.log("Project details from API:", details); // ✅ check console
-
+    
     if (details) {
       const baseForm = {
         name: details.name || "",

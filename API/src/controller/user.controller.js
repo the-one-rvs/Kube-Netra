@@ -307,6 +307,27 @@ const deleteUser = asyncHandler(async(req, res) => {
     }
 })
 
+const deleteAnyUser = asyncHandler(async(req, res) => {
+    try {
+        const { userId } = req.params
+        if (!userId) {
+            throw new ApiError(400, "User Id not found")
+        }
+        await User.findByIdAndDelete(userId)
+
+        const options = {
+            secure: true,
+            httpOnly: true
+        }
+
+        return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "User deleted successfully"))
+    } catch (error) {
+        throw new ApiError(400, error?.message)
+    }
+})
+
 const updateUser = asyncHandler(async(req, res) => {
     try {
         const {fullname, username, email} = req.body
@@ -423,6 +444,19 @@ const validateToken = asyncHandler(async(req, res) => {
     }
 })
 
+const getUserDetails = asyncHandler(async(req, res) => {
+    try {
+        const {userId} = req.params
+        const user = await User.findById(userId).select("-password")
+        if (!user) {
+            throw new ApiError(400, "User not found")
+        }
+        return res.status(200).json(new ApiResponse(200, user, "User found successfully"))
+    } catch (error) {
+        throw new ApiError(400, error?.message)
+    }
+})
+
 
 export {
     createRootAdmin, 
@@ -436,5 +470,7 @@ export {
     changePassword,
     getAllUser,
     checkAdminExsists,
-    validateToken
+    validateToken,
+    getUserDetails,
+    deleteAnyUser
 }

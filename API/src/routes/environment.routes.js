@@ -8,7 +8,6 @@ import {
     getEnvironment,
     updateEnvironment
 } from "../controller/environment.controller.js";
-import { requireAnyPermission } from "../middleware/requirePermissions.middleware.js";
 import { validateGitHubRepo } from "../middleware/checkGitHubRepo.middleware.js";
 import { checkForGithubPAT } from "../middleware/checkforPAT.middleware.js";
 
@@ -17,22 +16,22 @@ const router = Router();
 
 router
 .route("/createEnvironment")
-.post(verifyJWT, verifyProject, requireAnyPermission("admin", "access_create_environment", "access_full_project", "access_full_environment"), checkForGithubPAT, validateGitHubRepo, createEnvironment)
+.post(verifyJWT, verifyProject, checkForGithubPAT, validateGitHubRepo, createEnvironment)
 
 router
 .route("/getEnvironment/:projectId/:environmentNumber")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_view_environment"), getEnvironment)
+.get(verifyJWT, verifyProject, getEnvironment)
 
 router
 .route("/updateEnvironment/:environmentId")
-.patch(verifyJWT, verifyProject, requireAnyPermission("admin", "access_update_environment", "access_full_project", "access_full_environment"),validateGitHubRepo, updateEnvironment)
+.patch(verifyJWT, verifyProject,validateGitHubRepo, updateEnvironment)
 
 router
 .route("/getAllEnvironment")
-.get(verifyJWT, verifyProject,requireAnyPermission("admin", "access_view_environment", "access_full_project", "access_full_environment"), getAllEnvironment)
+.get(verifyJWT, verifyProject, getAllEnvironment)
 
 router
 .route("/deleteEnvironment/:environmentId")
-.delete(verifyJWT, verifyProject,requireAnyPermission("admin", "access_delete_environment", "access_full_project", "access_full_environment"), deleteEnvironment)
+.delete(verifyJWT, verifyProject, deleteEnvironment)
 
 export default router

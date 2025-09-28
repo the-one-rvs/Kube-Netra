@@ -3,16 +3,23 @@ import {
     addPAT, 
     addPATinProject, 
     deletePAT, 
-    showPATProjects } from "../controller/pat.controller.js";
+    removePATFromProject, 
+    showAllPats, 
+    showNonPATProjects, 
+    showPATDetails, 
+     } from "../controller/pat.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
-import { requireAnyPermission } from "../middleware/requirePermissions.middleware.js";
+import { requireAnyPermission, requirePatPermission } from "../middleware/requirePermissions.middleware.js";
 import { verifyProject } from "../middleware/project.middleware.js";
 
 const router = Router();
 
-router.route("/addGithubPAT").post(verifyJWT,requireAnyPermission("admin", "access_add_pat"), addPAT)
-router.route("/showPATProjects").get(verifyJWT, showPATProjects)
-router.route("/addPATinProject").post(verifyJWT, verifyProject, requireAnyPermission("admin", "access_add_pat_in_project"), addPATinProject)
-router.route("/deletePAT").delete(verifyJWT, requireAnyPermission("admin", "access_delete_pat"), deletePAT)
+router.route("/addGithubPAT").post(verifyJWT, requirePatPermission("create"), addPAT)
+router.route("/showPATDetails/:patId").get(verifyJWT,requirePatPermission("show"), showPATDetails)
+router.route("/addPATinProject").post(verifyJWT, requirePatPermission("addPATInProject"), addPATinProject)
+router.route("/deletePAT/:patId").delete(verifyJWT, requirePatPermission("delete"), deletePAT)
+router.route("/showAllPAT").get(verifyJWT, showAllPats)
+router.route("/filteredProjects").get(verifyJWT, requirePatPermission("show"), showNonPATProjects)
+router.route("/removePATFromProject").post(verifyJWT, requirePatPermission("removePATFromProject"), removePATFromProject)
 
 export default router

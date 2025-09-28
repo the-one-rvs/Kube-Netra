@@ -28,6 +28,36 @@ export const updateProject = createAsyncThunk(
   }
 );
 
+// ✅ Delete project
+export const deleteProject = createAsyncThunk(
+  "projects/deleteProject",
+  async ( _ , { rejectWithValue }) => {
+    try {
+      const { data } = await axios.delete(
+        "/api/v1/project/deleteProject"
+      );
+      return data.message; 
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// ✅ Exit project
+export const exitProject = createAsyncThunk(
+  "projects/exitProject",
+  async ( _ ,{ rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(
+        "/api/v1/project/exitProject"
+      );
+      return data.message; 
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const projectOpSlice = createSlice({
   name: "projects",
   initialState: {
@@ -35,6 +65,7 @@ const projectOpSlice = createSlice({
     error: null,
     success: false,
     details: null,
+    actionMessage: null,
   },
   reducers: {
     resetProjectState: (state) => {
@@ -74,6 +105,36 @@ const projectOpSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.success = false;
+      })
+      .addCase(deleteProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProject.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.details = null; // project delete hone ke baad details clear
+        state.actionMessage = action.payload;
+      })
+      .addCase(deleteProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ✅ exit project
+      .addCase(exitProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(exitProject.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.details = null; // exit hone pe bhi project clear
+        state.actionMessage = action.payload;
+      })
+      .addCase(exitProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

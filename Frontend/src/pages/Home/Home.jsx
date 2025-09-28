@@ -32,7 +32,7 @@ const Home = () => {
       buttonText: "Click Here",
       btncolor: "bg-yellow-800",
       hovercolor: "hover:bg-blue-700",
-      onClick: () => navigate("/patHome"),
+      onClick: () => navigate("/pats"),
     },
     {
       emoji: "👥",
@@ -41,7 +41,7 @@ const Home = () => {
       buttonText: "Click Here",
       btncolor: "bg-green-600",
       hovercolor: "hover:bg-blue-700",
-      onClick: () => navigate("/teamHome"),
+      onClick: () => navigate("/team"),
     },
   ];
 
@@ -122,6 +122,8 @@ const Home = () => {
               <u>hands-free release management</u>, reduce deployment drift, and
               embrace a smarter way to ship software in Kubernetes 🚀
             </p>
+
+            <p> <strong> I have to list one important thing if the buttons are not working then let ask your admin to provide permission because this project having highly IAM embedded </strong></p>
           </div>
         </section>
 

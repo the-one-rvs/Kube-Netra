@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import RegisterAdmin from "../pages/Auth/RegisterAdmin";
 import Login from "../pages/Auth/Login";
 import Home from "../pages/Home/Home";
-import { Edit } from "lucide-react";
+// import { Edit } from "lucide-react";
 import EditProfile from "../pages/User/EditProfile";
 import ChangePassword from "../pages/User/ChangePassword";
 import Landing from "../pages/Home/Landing";
@@ -13,6 +13,13 @@ import ProjectPage from "../pages/Project/ProjectPage";
 import CreateEnvironment from "../pages/Environment/CreateEnvironment";
 import UpdateEnvironment from "../pages/Environment/UpdateEnvironment";
 import UpdateProject from "../pages/Project/UpdateProject";
+import PATHome from "../pages/PAT/PATHome";
+import AddPAT from "../pages/PAT/AddPAT";
+import PATPage from "../pages/PAT/PATPage";
+import PATFilteredProjects from "../pages/PAT/PATFilteredProjects";
+import TeamHome from "../pages/Team/TeamHome";
+import CreateMember from "../pages/Team/CreateMember";
+import ModifyPermissionsPage from "../pages/Team/ModifyPermissions";
 
 const AppRoutes = () => {
   return (
@@ -31,6 +38,13 @@ const AppRoutes = () => {
         <Route path="/projects/environment/addEnvironment" element={<CreateEnvironment />}></Route>
         <Route path="/projects/:projectId/environment/:environmentNumber/edit/:environmentId" element={<UpdateEnvironment />}></Route>
         <Route path="/projects/:projectId/update" element={<UpdateProject />}></Route>
+        <Route path="/pats" element={<PATHome />}></Route>
+        <Route path="pats/addPat" element={<AddPAT />}></Route>
+        <Route path="/pats/:patId" element={<PATPage />} /> 
+        <Route path="/pats/:patId/addProjectToPAT" element={<PATFilteredProjects />}></Route>
+        <Route path="/team" element={<TeamHome />}></Route>
+        <Route path="/team/addMember" element={<CreateMember />}></Route>
+        <Route path="/members/:userId/permissions" element={<ModifyPermissionsPage />}></Route>
       </Routes>
     </Router>
   );

@@ -9,6 +9,9 @@ import projectPageReducer from "../features/projects/projectPageSlice";
 // import pageSSESliceReducer from "../features/projects/pageSSESlice";
 import environmentReducer from "../features/environments/environmentSlice"
 import projectOpReducer from "../features/projects/projectOpSlice";
+import patReducer from "../features/PAT/patSlice";
+import patPageReducer from "../features/PAT/patPageSlice"
+import teamReducer from "../features/user/teamSlice"
 
 export const store = configureStore({
   reducer: {
@@ -20,7 +23,10 @@ export const store = configureStore({
     projects: projectReducer,
     projectPage: projectPageReducer,
     environments: environmentReducer,
-    projectOp: projectOpReducer
+    projectOp: projectOpReducer,
+    pat: patReducer,
+    patPage: patPageReducer,
+    team: teamReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

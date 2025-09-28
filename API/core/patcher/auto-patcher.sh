@@ -29,10 +29,6 @@ REPO_NAME=$(basename "${GIT_REPO}")
 
 GIT_REPO_URL=https://${GITHUB_USERNAME}:${GITHUB_PAT}@github.com/${GITHUB_USERNAME}/${REPO_NAME}.git
 
-git config --global user.name "the-one-rvs"
-git config --global user.email "vaibhavsarswat142005@gmail.com"
-
-
 PATCHER_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
 REPOS_DIR="$PATCHER_DIR/repos/$DOCKER_PROJECT_NAME"
 mkdir -p "$REPOS_DIR"

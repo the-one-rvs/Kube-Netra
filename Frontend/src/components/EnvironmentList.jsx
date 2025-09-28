@@ -1,4 +1,3 @@
-// src/components/EnvironmentList.jsx
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { startManualPatcher } from "../features/projects/projectPageSlice";
@@ -19,11 +18,6 @@ const EnvironmentList = ({ environments = [], onDeleteSuccess }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, success, error } = useSelector((state) => state.environments); // ✅ read state
-  
-
-  if (!environments || environments.length === 0) {
-    return <p className="text-gray-500 text-center">No environments found.</p>;
-  }
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -39,24 +33,32 @@ const EnvironmentList = ({ environments = [], onDeleteSuccess }) => {
         </button>
       </div>
 
-      {/* Vertical scrollable list */}
-      <div className="w-full max-w-3xl max-h-[70vh] overflow-y-auto space-y-6 pr-2">
-        {environments.map((env, idx) => (
-          <EnvironmentCard
-            key={env._id}
-            env={env}
-            color={colors[idx % colors.length]}
-            dispatch={dispatch}
-            navigate={navigate}
-            loading={loading}
-            onDeleteSuccess={onDeleteSuccess}
-          />
-        ))}
-      </div>
+      {/* Agar environments empty hai */}
+      {(!environments || environments.length === 0) ? (
+        <p className="text-gray-500 text-center">No environments found.</p>
+      ) : (
+        <div className="w-full max-w-3xl max-h-[70vh] overflow-y-auto space-y-6 pr-2">
+          {environments.map((env, idx) => (
+            <EnvironmentCard
+              key={env._id}
+              env={env}
+              color={colors[idx % colors.length]}
+              dispatch={dispatch}
+              navigate={navigate}
+              loading={loading}
+              onDeleteSuccess={onDeleteSuccess}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Feedback */}
       {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
-      {success && <p className="text-green-600 text-sm mt-4">Environment deleted! Please reload</p>}
+      {success && (
+        <p className="text-green-600 text-sm mt-4">
+          Environment deleted! Please reload
+        </p>
+      )}
     </div>
   );
 };
@@ -64,7 +66,6 @@ const EnvironmentList = ({ environments = [], onDeleteSuccess }) => {
 const EnvironmentCard = ({ env, color, dispatch, navigate, loading, onDeleteSuccess }) => {
   const [tag, setTag] = useState(null);
   const [polling, setPolling] = useState(true);
-  
 
   // Polling for current image tag
   useEffect(() => {

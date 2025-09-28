@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { verifyProject } from "../middleware/project.middleware.js";
-import { requireAnyPermission } from "../middleware/requirePermissions.middleware.js";
+import { requireAnyPermission, requireProjectPermission } from "../middleware/requirePermissions.middleware.js";
 import { callWorkflow, enableLogCleaner, getImageTagForEnvironment, startManualPatcher, stopWorkflow, streamPatcherLogs, streamWatcherLogs, streamWorkflowLogs } from "../controller/coreCaller.controller.js";
 
 
@@ -9,27 +9,27 @@ import { callWorkflow, enableLogCleaner, getImageTagForEnvironment, startManualP
 const router = Router();
 
 router.route("/startWorkflow")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), callWorkflow);
+.get(verifyJWT, verifyProject, requireProjectPermission("workflow"), callWorkflow);
 
 router.route("/stopWorkflow")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), stopWorkflow);
+.get(verifyJWT, verifyProject, requireProjectPermission("workflow"), stopWorkflow);
 
 router.route("/logs/workflow")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), streamWorkflowLogs);
+.get(verifyJWT, verifyProject, requireProjectPermission("workflow"), streamWorkflowLogs);
 
 router.route("/logs/watcher")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), streamWatcherLogs);
+.get(verifyJWT, verifyProject, requireProjectPermission("workflow"), streamWatcherLogs);
 
 router.route("/logs/patcher/:envId")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), streamPatcherLogs);
+.get(verifyJWT, verifyProject, requireProjectPermission("workflow"), streamPatcherLogs);
 
 router.route("/logsCleaner")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), enableLogCleaner);
+.get(verifyJWT, verifyProject, requireProjectPermission("workflow"), enableLogCleaner);
 
 router.route("/startManualPatcher/:environmentId")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin", "access_full_project", "access_to_core"), startManualPatcher);
+.get(verifyJWT, verifyProject, requireProjectPermission("workflow"), startManualPatcher);
 
 router.route("/getImageTagForEnvironment/:envId")
-.get(verifyJWT, verifyProject, requireAnyPermission("admin"), getImageTagForEnvironment);
+.get(verifyJWT, verifyProject, requireProjectPermission("show") , getImageTagForEnvironment);
 
 export default router;

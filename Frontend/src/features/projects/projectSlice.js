@@ -30,7 +30,7 @@ export const fetchProjects = createAsyncThunk(
   "projects/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get("api/v1/project/getAllProjects");
+      const res = await axios.get("/api/v1/project/getAllProjects");
 
       // 🔹 response shape fix
       if (res.data && res.data.success) {

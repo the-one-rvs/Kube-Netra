@@ -11,8 +11,8 @@ const Landing = () => {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
   };
-  console.log("All cookies:", document.cookie);
-  console.log("Access Token:", getCookie("accessToken"));
+  // console.log("All cookies:", document.cookie);
+  // console.log("Access Token:", getCookie("accessToken"));
 
 
   useEffect(() => {

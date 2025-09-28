@@ -36,7 +36,7 @@ const UpdateEnvironment = () => {
 
   // auto-fill
   useEffect(() => {
-    console.log("details", details);
+    // console.log("details", details);
     if (details) {
       setForm({
         environmentName: details.environmentName || "",
