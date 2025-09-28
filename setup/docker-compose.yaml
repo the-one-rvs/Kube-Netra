@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  backend:
+    image: quasarcelestio/kube-netra-bk:0.0.1
+    container_name: kube-netra-api
+    env_file:
+      - .env.api.config
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    networks:
+      - kube-netra-net
+
+  frontend:
+    image: quasarcelestio/kube-netra-fr:0.0.1
+    container_name: kube-netra-frontend
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+    env_file:
+      - .env.frontend.config
+    depends_on:
+      - backend
+    networks:
+      - kube-netra-net
+
+  mongo:
+    image: mongo:6.0
+    container_name: kube-netra-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    networks:
+      - kube-netra-net
+
+  mongo-express:
+    image: mongo-express:1.0.0-alpha.4
+    container_name: kube-netra-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - kube-netra-net
+
+volumes:
+  mongo_data:
+
+networks:
+  kube-netra-net:
+    driver: bridge
