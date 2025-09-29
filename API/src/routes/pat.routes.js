@@ -16,10 +16,10 @@ const router = Router();
 
 router.route("/addGithubPAT").post(verifyJWT, requirePatPermission("create"), addPAT)
 router.route("/showPATDetails/:patId").get(verifyJWT,requirePatPermission("show"), showPATDetails)
-router.route("/addPATinProject").post(verifyJWT, requirePatPermission("addPATInProject"), addPATinProject)
+router.route("/addPATinProject/:patId").post(verifyJWT, requirePatPermission("addPATInProject"), addPATinProject)
 router.route("/deletePAT/:patId").delete(verifyJWT, requirePatPermission("delete"), deletePAT)
 router.route("/showAllPAT").get(verifyJWT, showAllPats)
-router.route("/filteredProjects").get(verifyJWT, requirePatPermission("show"), showNonPATProjects)
-router.route("/removePATFromProject").post(verifyJWT, requirePatPermission("removePATFromProject"), removePATFromProject)
+router.route("/filteredProjects/:patId").get(verifyJWT, requirePatPermission("show"), showNonPATProjects)
+router.route("/removePATFromProject/:patId").post(verifyJWT, requirePatPermission("removePATFromProject"), removePATFromProject)
 
 export default router

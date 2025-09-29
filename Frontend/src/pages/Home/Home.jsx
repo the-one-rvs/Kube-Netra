@@ -125,6 +125,15 @@ const Home = () => {
 
             <p> <strong> I have to list one important thing if the buttons are not working then let ask your admin to provide permission because this project having highly IAM embedded </strong></p>
           </div>
+          <br />
+          <div
+            className="font-bold underline text-center mt-8 text-2xl"> Architecture of GitOps using Kube-Netra </div>
+          <br />
+
+          <div
+            className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center p-6"
+            style={{ backgroundImage: "url('/architecture.png')" }}
+          />
         </section>
 
         {/* Query Section */}

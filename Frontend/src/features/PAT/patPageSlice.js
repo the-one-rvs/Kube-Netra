@@ -17,9 +17,9 @@ export const fetchPATDetails = createAsyncThunk(
 // Fetch filtered projects (non-PAT)
 export const fetchFilteredProjects = createAsyncThunk(
   "patDetails/fetchFilteredProjects",
-  async (_, { rejectWithValue }) => {
+  async (patId, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`/api/v1/pat/filteredProjects`);
+      const res = await axios.get(`/api/v1/pat/filteredProjects/${patId}`);
       return res.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch projects");
@@ -30,9 +30,9 @@ export const fetchFilteredProjects = createAsyncThunk(
 // Add PAT to a project
 export const addPATinProject = createAsyncThunk(
   "patDetails/addPATinProject",
-  async ({ projectId, nameOfPAT }, { rejectWithValue }) => {
+  async ({ patId,projectId, nameOfPAT }, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`/api/v1/pat/addPATinProject`, { projectId, nameOfPAT });
+      const res = await axios.post(`/api/v1/pat/addPATinProject/${patId}`, { projectId, nameOfPAT });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to add PAT to project");
@@ -44,7 +44,7 @@ export const removeProjectFromPAT = createAsyncThunk(
   "patPage/removeProjectFromPAT",
   async ({ patId, projectId }, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`/api/v1/pat/removePATFromProject`, {
+      const res = await axios.post(`/api/v1/pat/removePATFromProject/${patId}`, {
         patId,
         projectId,
       });
