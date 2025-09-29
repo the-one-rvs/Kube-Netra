@@ -28,7 +28,7 @@ const CreateEnvironment = () => {
 
   useEffect(() => {
     if (environment) {
-      navigate("/environments");
+      navigate("/projects");
       setTimeout(() => {
         dispatch(clearEnvironmentState());
       }, 500);

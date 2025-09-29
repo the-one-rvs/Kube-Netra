@@ -18,6 +18,10 @@ export const validateGitHubRepo = async (req, res, next) => {
 
         const githubPATresult = await GithubPAT.findOne({ nameOfPAT: project.nameOfGithubPAT });
 
+        if (!githubPATresult) {
+            throw new ApiError(400, "Unauthorized request Project does not have any githubPAT")
+        }
+
         const githubPAT = githubPATresult.githubPAT;
 
         if (!gitRepo) {
@@ -28,7 +32,7 @@ export const validateGitHubRepo = async (req, res, next) => {
 
         if (gitRepoName && branch) {
             const headers = {};
-            if (githubPAT?.githubPAT) {
+            if (githubPAT) {
                 headers["Authorization"] = `token ${githubPAT}`;
             }
 
