@@ -134,21 +134,16 @@ It helps you quickly spin up the full stack (API, Frontend, MongoDB) using Docke
    - Copy `.env.api.sample.config` to `.env.api.config` and fill in your MongoDB URI, secrets, etc.
    - Copy `.env.frontend.sample.config` to `.env.frontend.config` and set your API URL.
 
-3. **Build Docker images (from project root):**
+3. **Run everything:**
    ```sh
-   docker compose -f setup/docker-compose.yaml build
+   docker-compose  up -d
    ```
 
-4. **Run everything:**
-   ```sh
-   docker compose -f setup/docker-compose.yaml up -d
-   ```
-
-5. **Access the stack:**
-   - **Backend API:** [http://localhost:8000](http://localhost:8000)
-   - **Frontend:** [http://localhost:5173](http://localhost:5173)
-   - **Swagger Docs:** [http://localhost:8000/api-docs](http://localhost:8000/api-docs)
-   - **MongoDB:** [localhost:27017](localhost:27017)
+4. **Access the stack:**
+   - **Backend API:** [<host-ip>:8000](<host-ip>:8000)
+   - **Frontend:** [<host-ip>:5173](<host-ip>:5173)
+   - **Swagger Docs:** [<host-ip>:8000/api-docs](<host-ip>:8000/api-docs)
+   - **MongoDB:** [<host-ip>:27017](<host-ip>:27017)
 
 ---
 
