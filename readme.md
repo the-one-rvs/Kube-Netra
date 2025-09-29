@@ -83,9 +83,9 @@ Kube-Netra__WEB/
    ```sh
    docker compose up -d
    ```
-   - Backend: [http://localhost:8000](http://localhost:8000)
-   - Frontend: [http://localhost:5173](http://localhost:5173)
-   - Swagger API Docs: [http://localhost:8000/api-docs](http://localhost:8000/api-docs)
+   - Backend: [<hostip>:8081](<hostip>:8081)
+   - Frontend: [<hostip>:9091](<hostip>:9091)
+   - Swagger API Docs:[<hostip>:8081/api-docs](<hostip>:8081/api-docs)
 
 ---
 
