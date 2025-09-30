@@ -89,6 +89,15 @@ Kube-Netra__WEB/
 
 ---
 
+5. **How to create a promotion or realese pipeline**
+
+  --> Go to project section and add a project with corresponding docker image details 
+  --> Go to PAT section create a PAT or use exsiting one to add in the project 
+  --> Go to Project section and go inside your project for creating different environments relative to your helm manifests and   ArgoCD deployment information from helm repository
+  --> Now, Run the Project and every thing is up you have the logs section ready for you 
+  --> If a new tag updated in dockerhub registry then you can see the magic happen
+
+
 ## 🛠️ Features
 
 - **User Management:** Register, login, assign roles, and manage permissions.
