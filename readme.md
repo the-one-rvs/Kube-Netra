@@ -224,8 +224,7 @@ It brings together a powerful backend (Node.js, MongoDB, Bash, Docker, GitHub, K
 
 1. **Clone the repository:**
    ```sh
-   git clone <repo-url>
-   cd Kube-Netra__WEB
+   git clone https://github.com/the-one-rvs/Kube-Netra
    ```
 
 2. **Configure environment variables:**  
@@ -293,7 +292,7 @@ It helps you quickly spin up the full stack (API, Frontend, MongoDB) using Docke
 
 1. **Clone the repo:**
    ```sh
-   git clone <repo-url>
+   git clone https://github.com/the-one-rvs/Kube-Netra
    cd Kube-Netra
    cd setup
    ```

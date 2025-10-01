@@ -23,7 +23,7 @@ It helps you quickly spin up the full stack (API, Frontend, MongoDB) using Docke
 
 1. **Clone the repo:**
    ```sh
-   git clone <repo-url>
+   git clone https://github.com/the-one-rvs/Kube-Netra
    cd Kube-Netra
    cd setup
    ```
