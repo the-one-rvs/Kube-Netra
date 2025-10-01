@@ -220,33 +220,9 @@ It brings together a powerful backend (Node.js, MongoDB, Bash, Docker, GitHub, K
 
 ---
 
-## ⚡ Getting Started
 
-1. **Clone the repository:**
-   ```sh
-   git clone https://github.com/the-one-rvs/Kube-Netra
-   ```
 
-2. **Configure environment variables:**  
-   - Copy `API/.env.example` to `API/.env` and fill in the required values.
-   - Copy `Frontend/.env.example` to `Frontend/.env` and set your backend API URL.
-
-3. **Build Docker images:**
-   ```sh
-   docker compose build
-   ```
-
-4. **Run the stack:**
-   ```sh
-   docker compose up -d
-   ```
-   - Backend: [<hostip>:8081](<hostip>:8081)
-   - Frontend: [<hostip>:9091](<hostip>:9091)
-   - Swagger API Docs:[<hostip>:8081/api-docs](<hostip>:8081/api-docs)
-
----
-
-5. **How to create a promotion or realese pipeline**
+## ⚡ How to create a promotion or realese pipeline
 
   - Go to project section and add a project with corresponding docker image details 
   - Go to PAT section create a PAT or use exsiting one to add in the project 
