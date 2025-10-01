@@ -294,7 +294,8 @@ It helps you quickly spin up the full stack (API, Frontend, MongoDB) using Docke
 1. **Clone the repo:**
    ```sh
    git clone <repo-url>
-   cd Kube-Netra__WEB/setup
+   cd Kube-Netra
+   cd setup
    ```
 
 2. **Configure environment variables:**
