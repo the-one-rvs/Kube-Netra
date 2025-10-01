@@ -9,6 +9,7 @@ import { promisify } from "util";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import logger from "../utils/logger.js";
 import e from "express";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -76,12 +77,25 @@ const callWorkflow = asyncHandler(async(req, res) => {
         });
 
         child.stdout.on("data", (data) => {
-            console.log(`stdout: ${data}`);
+            logger.info({
+              source: "workflow",
+              type: "stdout",
+              message: data.toString(),
+              project: req.project.name,
+              timestamp: new Date().toISOString()
+            });
         });
 
         child.stderr.on("data", (data) => {
-            console.error(`stderr: ${data}`);
+            logger.error({
+                source: "workflow",
+                type: "stderr",
+                message: data.toString(),
+                project: req.project.name,
+                timestamp: new Date().toISOString()
+            });
         });
+
 
         child.on("close", (code) => {
             console.log(`child process exited with code ${code}`);
@@ -296,11 +310,23 @@ const stopWorkflow = asyncHandler(async (req, res) => {
     });
 
     child.stdout.on("data", (data) => {
-        console.log(`stdout: ${data}`);
+        logger.info({
+          source: "workflow",
+          type: "stdout",
+          message: data.toString(),
+          project: req.project.name,
+          timestamp: new Date().toISOString()
+        });
     });
 
     child.stderr.on("data", (data) => {
-        console.error(`stderr: ${data}`);
+        logger.error({
+            source: "workflow",
+            type: "stderr",
+            message: data.toString(),
+            project: req.project.name,
+            timestamp: new Date().toISOString()
+        });
     });
 
     child.on("close", (code) => {

@@ -3,7 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import yaml from "yamljs";
 import swaggerUi from "swagger-ui-express";
-import errorHandler from './middleware/errorHandler.js'
+import errorHandler from './middleware/errorHandler.middleware.js'
+import requestLogger from "./middleware/requestLogger.middleware.js";
 import { ApiError } from './utils/ApiError.js';
 
 
@@ -18,6 +19,9 @@ if (process.env.NODE_ENV === "dev") {
     const swaggerDocument = yaml.load("./docs/swagger.yaml");
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
+
+app.use(requestLogger);
+
 
 // app.use(session({
 //     secret: process.env.SESSION_SECRET || "notify_secret",
