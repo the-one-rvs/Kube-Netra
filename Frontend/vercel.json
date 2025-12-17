@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://kube-netra-backend.onrender.com/api/:path*"
+    }
+  ]
+}
