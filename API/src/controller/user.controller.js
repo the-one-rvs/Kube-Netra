@@ -163,7 +163,7 @@ const loginUser = asyncHandler(async(req, res) => {
         const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
         const options = {
-            secure: true,
+            secure: false,
             httpOnly: true
         }
 
@@ -252,7 +252,7 @@ const reclaimTokens = asyncHandler(async(req, res) => {
         await user.save()
 
         const options = {
-            secure: true,
+            secure: false,
             httpOnly: true
         }
 
