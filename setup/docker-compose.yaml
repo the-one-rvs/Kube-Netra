@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   backend:
-    image: quasarcelestio/kube-netra-bk:1.0.0
+    image: quasarcelestio/kube-netra-bk:1.0.1
     container_name: kube-netra-api
     env_file:
       - .env.api.config
